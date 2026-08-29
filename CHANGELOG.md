@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0 - Dakjaniels
+
+- Named HUD layouts (20 per account, 20 per character). Khajiit is impressed you have this many characters. Khajiit is also concerned. Features Save / New / Rename / Delete.
+- Import and export via compact `HUDT` share strings (Ctrl+C in the export dialog; addons cannot write the clipboard)
+- Layout controls on the HUD Editor Info Box, plus the settings gear menu and `/hudis`
+- Switching a character layout reapplies it on login because the base-game HUD is account-wide
+- A layout that omits an addon HUD element clears that element's saved position (it returns to default)
+
 ## 1.0.2 - Dakjaniels
 
 - Added live color picker in the HUD editor (grid, selected, unselected, and hidden element colors)

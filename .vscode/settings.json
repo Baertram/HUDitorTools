@@ -1,4 +1,11 @@
 {
+    "Lua.workspace.library": [
+        "C:/Users/dack_janiels/Desktop/LUIE_WORKSPACE/EsoUI/EsoUI",
+        "C:/Users/dack_janiels/Desktop/ESO_WORKSPACE/.meta",
+        "C:/Users/dack_janiels/Documents/LUIE/resources/LibAddonMenu-2.0",
+        "C:/Users/dack_janiels/source/repos/meta/addon_lib_docs/LibScrollableMenu",
+        "C:/Users/dack_janiels/Documents/Elder Scrolls Online/live/AddOns/LibScrollableMenu"
+    ],
     "xml.format.splitAttributes": "alignWithFirstAttr",
     "xml.fileAssociations": [
         {
@@ -13,5 +20,9 @@
             "pattern": "**/*.xml",
             "systemId": "https://raw.githubusercontent.com/DakJaniels/esoui_gui_xsd/main/esoui_gui_xml.xsd"
         }
+    ],
+    "Lua.diagnostics.disable": [
+        "param-type-mismatch",
+        "inject-field"
     ],
 }
