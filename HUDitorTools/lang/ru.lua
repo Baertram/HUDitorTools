@@ -47,3 +47,5 @@ SafeAddString(SI_HUDITORTOOLS_LAYOUT_SAVE_TOOLTIP, "Копирует текущ�
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_NEW_TOOLTIP, "Создаёт именованный макет из текущего интерфейса.", 1)
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_IMPORT_TOOLTIP, "Вставляет строку обмена, чтобы создать и применить именованный макет.", 1)
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_EXPORT_TOOLTIP, "Показывает строку обмена для текущего интерфейса. Скопируйте её через Ctrl+C.", 1)
+SafeAddString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT, "Сообщения в чат", 1)
+SafeAddString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT_TOOLTIP, "Выводит в чат сведения о применении макета и уведомления о скрытии/показе элементов в редакторе. Большинству игроков это не нужно.", 1)

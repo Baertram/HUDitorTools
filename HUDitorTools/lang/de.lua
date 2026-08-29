@@ -47,3 +47,5 @@ SafeAddString(SI_HUDITORTOOLS_LAYOUT_SAVE_TOOLTIP, "Kopiert das Live-HUD in das 
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_NEW_TOOLTIP, "Erstellt ein benanntes Layout aus dem Live-HUD.", 1)
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_IMPORT_TOOLTIP, "Fügt einen Teilungsstring ein, um ein benanntes Layout zu erstellen und anzuwenden.", 1)
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_EXPORT_TOOLTIP, "Zeigt einen Teilungsstring für das Live-HUD. Mit Strg+C kopieren.", 1)
+SafeAddString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT, "Chat-Nachrichten anzeigen", 1)
+SafeAddString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT_TOOLTIP, "Gibt Details zum Anwenden von Layouts und Hinweise zum Ein-/Ausblenden im HUD-Editor im Chat aus. Für die meisten Spieler nicht nötig.", 1)

@@ -102,7 +102,16 @@ HT.Defaults =
     hudLayoutsAccount                  = {},
     hudLayoutsCharacter                = {},
     hudLayoutSelectionByCharacter      = {},
+    showChatMessages                   = false,
 }
+
+-- CHAT_ROUTER:AddSystemMessage (EsoUI/Ingame/ChatSystem/ChatHandlers.lua)
+function HT.AddChatSystemMessage(message)
+    if not HT.SV or not HT.SV.showChatMessages then
+        return
+    end
+    CHAT_ROUTER:AddSystemMessage(message)
+end
 
 -- local vanilla ZOs class and manager object variables
 --- CLASSES
@@ -351,7 +360,7 @@ local function hideElementUIInHUDOrEditor(elementCtrl, hideInHUDEditor)
     if hideInHUDEditor == false then hideInHUDEditor = nil end
     local elementName = getElementRealTLCName(elementCtrl, nil)
     if setHUDElementHiddenState(elementName, hideInHUDEditor, elementCtrl) == true then
-        d("[HT]HUD Editor element '" .. tostring((hideInHUDEditor == true and SCENE_HIDDEN) or SCENE_SHOWN) .. "': '" .. tostring(getElementDisplayName(elementCtrl) .. "' - " .. tostring(elementName)))
+        HT.AddChatSystemMessage("[HT]HUD Editor element '" .. tostring((hideInHUDEditor == true and SCENE_HIDDEN) or SCENE_SHOWN) .. "': '" .. tostring(getElementDisplayName(elementCtrl) .. "' - " .. tostring(elementName)))
         return true
     end
 end
@@ -1046,7 +1055,7 @@ local function InstallEditorHooks(fromSceneChange)
                 end
             end
             if HUDEditContextMenu and numUserHiddenHUDEditorElements > 0 then
-                d("[HT]HUD Editor hides '" .. tostring(numUserHiddenHUDEditorElements) .. "' user-hidden elements!")
+                HT.AddChatSystemMessage("[HT]HUD Editor hides '" .. tostring(numUserHiddenHUDEditorElements) .. "' user-hidden elements!")
             end
         end)
         HEEKRefreshColorsHooked = true

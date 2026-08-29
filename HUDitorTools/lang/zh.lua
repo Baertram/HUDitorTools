@@ -47,3 +47,5 @@ SafeAddString(SI_HUDITORTOOLS_LAYOUT_SAVE_TOOLTIP, "将当前 HUD 复制到所�
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_NEW_TOOLTIP, "根据当前 HUD 创建已命名布局。", 1)
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_IMPORT_TOOLTIP, "粘贴分享字符串以创建并应用已命名布局。", 1)
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_EXPORT_TOOLTIP, "显示当前 HUD 的分享字符串。使用 Ctrl+C 复制。", 1)
+SafeAddString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT, "显示聊天消息", 1)
+SafeAddString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT_TOOLTIP, "在聊天中打印布局应用详情以及 HUD 编辑器的隐藏/显示提示。大多数玩家可以关闭此项。", 1)

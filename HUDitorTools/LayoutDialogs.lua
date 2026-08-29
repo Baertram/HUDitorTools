@@ -88,6 +88,7 @@ local function RefreshLayoutButtons()
 end
 
 function HT.RefreshLayoutInfoBoxSection()
+    HT.RefreshLamLayoutDropdown()
     local infoBox = HT.GetInfoBox()
     local infoBoxHidden = infoBox:IsHidden()
     layoutInfoBoxSection:SetHidden(infoBoxHidden)

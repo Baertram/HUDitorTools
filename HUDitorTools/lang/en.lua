@@ -47,3 +47,5 @@ ZO_CreateStringId("SI_HUDITORTOOLS_LAYOUT_SAVE_TOOLTIP", "Copy the live HUD into
 ZO_CreateStringId("SI_HUDITORTOOLS_LAYOUT_NEW_TOOLTIP", "Create a named layout from the live HUD.")
 ZO_CreateStringId("SI_HUDITORTOOLS_LAYOUT_IMPORT_TOOLTIP", "Paste a share string to create and apply a named layout.")
 ZO_CreateStringId("SI_HUDITORTOOLS_LAYOUT_EXPORT_TOOLTIP", "Show a share string for the live HUD. Use Ctrl+C to copy it.")
+ZO_CreateStringId("SI_HUDITORTOOLS_LAYOUT_LAM_CHAT", "Show chat messages")
+ZO_CreateStringId("SI_HUDITORTOOLS_LAYOUT_LAM_CHAT_TOOLTIP", "Print layout apply details and HUD editor hide/show notices to chat. Leave this off unless you need the extra diagnostics.")

@@ -47,3 +47,5 @@ SafeAddString(SI_HUDITORTOOLS_LAYOUT_SAVE_TOOLTIP, "Copie l'ATH actuel dans la d
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_NEW_TOOLTIP, "Crée une disposition nommée à partir de l'ATH actuel.", 1)
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_IMPORT_TOOLTIP, "Colle une chaîne de partage pour créer et appliquer une disposition nommée.", 1)
 SafeAddString(SI_HUDITORTOOLS_LAYOUT_EXPORT_TOOLTIP, "Affiche une chaîne de partage pour l'ATH actuel. Copiez-la avec Ctrl+C.", 1)
+SafeAddString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT, "Afficher les messages de discussion", 1)
+SafeAddString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT_TOOLTIP, "Affiche les détails d'application des dispositions et les notifications d'affichage/masquage de l'éditeur d'ATH dans le tchat. Inutile pour la plupart des joueurs.", 1)

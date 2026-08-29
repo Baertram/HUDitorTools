@@ -6,6 +6,29 @@
 -- Global table
 local HT = HUDitorTools
 
+-- LAM dropdown choices must be tables (dropdown.lua UpdateChoices uses #).
+-- Functions are valid for name/tooltip/getFunc, not for choices/choicesValues.
+local LAM_ACTIVE_LAYOUT_DROPDOWN_REFERENCE = "HUDitorTools_LAM_ActiveLayoutDropdown"
+local lamLayoutChoices = {}
+local lamLayoutChoiceValues = {}
+
+function HT.RefreshLamLayoutDropdown()
+    local names, values = HT.GetLayoutDropdownChoices()
+    ZO_ClearNumericallyIndexedTable(lamLayoutChoices)
+    ZO_ClearNumericallyIndexedTable(lamLayoutChoiceValues)
+    for index = 1, #names do
+        lamLayoutChoices[index] = names[index]
+        lamLayoutChoiceValues[index] = values[index]
+    end
+
+    local dropdownControl = _G[LAM_ACTIVE_LAYOUT_DROPDOWN_REFERENCE]
+    if not dropdownControl or not dropdownControl.UpdateChoices then
+        return
+    end
+    dropdownControl:UpdateChoices(lamLayoutChoices, lamLayoutChoiceValues)
+    dropdownControl:UpdateValue()
+end
+
 function HT.buildSettingsMenu()
     local LAM = LibAddonMenu2
     local defaults = HT.Defaults
@@ -27,6 +50,12 @@ function HT.buildSettingsMenu()
     }
     local lamSettingsPanelName = HT.eventName .. "_LAM"
     HT.LAMSettingsPanel = LAM:RegisterAddonPanel(lamSettingsPanelName, panelData)
+
+    CALLBACK_MANAGER:RegisterCallback("LAM-PanelOpened", function(panel)
+        if panel == HT.LAMSettingsPanel then
+            HT.RefreshLamLayoutDropdown()
+        end
+    end)
 
     local optionsTable =
     {
@@ -158,14 +187,8 @@ function HT.buildSettingsMenu()
             type = "dropdown",
             name = GetString(SI_HUDITORTOOLS_LAYOUT_LAM_ACTIVE),
             tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_LAM_ACTIVE_TOOLTIP),
-            choices = function()
-                local names = HT.GetLayoutDropdownChoices()
-                return names
-            end,
-            choicesValues = function()
-                local _, values = HT.GetLayoutDropdownChoices()
-                return values
-            end,
+            choices = lamLayoutChoices,
+            choicesValues = lamLayoutChoiceValues,
             getFunc = function()
                 return HT.GetActiveLayoutChoiceValue()
             end,
@@ -173,6 +196,20 @@ function HT.buildSettingsMenu()
                 HT.SwitchHudLayoutFromChoiceValue(value)
             end,
             scrollable = true,
+            width = "full",
+            reference = LAM_ACTIVE_LAYOUT_DROPDOWN_REFERENCE,
+        },
+        {
+            type = "checkbox",
+            name = GetString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT),
+            tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT_TOOLTIP),
+            getFunc = function()
+                return settings.showChatMessages
+            end,
+            setFunc = function(value)
+                settings.showChatMessages = value
+            end,
+            default = defaults.showChatMessages,
             width = "full",
         },
         {

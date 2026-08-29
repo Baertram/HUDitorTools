@@ -7,6 +7,8 @@
 - Layout controls on the HUD Editor Info Box, plus the settings gear menu and `/hudis`
 - Switching a character layout reapplies it on login because the base-game HUD is account-wide
 - A layout that omits an addon HUD element clears that element's saved position (it returns to default)
+- Fix `/hudis` LAM crash: Active layout dropdown now uses tables plus `UpdateChoices` (LAM does not accept functions for `choices`)
+- Optional chat messages (off by default): layout apply details and HUD editor hide/show notices
 
 ## 1.0.2 - Dakjaniels
 

@@ -255,18 +255,20 @@ function HT.ApplyHudLayoutPayload(payload, layoutName)
     suppressOffsetsChangedRefresh = false
     SetLiveLayoutBaseline(payloadToApply)
 
-    CHAT_ROUTER:AddSystemMessage(zo_strformat(
-        GetString(SI_HUDITORTOOLS_LAYOUT_APPLY_RESULT),
-        layoutName,
-        NonContiguousCount(payloadToApply.keyboardElements),
-        CountRegisteredMatches(function()
-            return HUD_MANAGER:KeyboardElementIterator()
-        end, payloadToApply.keyboardElements),
-        NonContiguousCount(payloadToApply.gamepadElements),
-        CountRegisteredMatches(function()
-            return HUD_MANAGER:GamepadElementIterator()
-        end, payloadToApply.gamepadElements)
-    ))
+    if HT.SV.showChatMessages then
+        HT.AddChatSystemMessage(zo_strformat(
+            GetString(SI_HUDITORTOOLS_LAYOUT_APPLY_RESULT),
+            layoutName,
+            NonContiguousCount(payloadToApply.keyboardElements),
+            CountRegisteredMatches(function()
+                return HUD_MANAGER:KeyboardElementIterator()
+            end, payloadToApply.keyboardElements),
+            NonContiguousCount(payloadToApply.gamepadElements),
+            CountRegisteredMatches(function()
+                return HUD_MANAGER:GamepadElementIterator()
+            end, payloadToApply.gamepadElements)
+        ))
+    end
     return true
 end
 
