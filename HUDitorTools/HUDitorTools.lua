@@ -103,6 +103,18 @@ HT.Defaults =
     hudLayoutsCharacter                = {},
     hudLayoutSelectionByCharacter      = {},
     showChatMessages                   = false,
+
+    elementAppearance                  =
+    {
+        keyboard = {},
+        gamepad = {},
+    },
+    resourceBarGroup                   =
+    {
+        enabled = false,
+        healthWidth = 474,
+        preventExpand = false,
+    },
 }
 
 -- CHAT_ROUTER:AddSystemMessage (EsoUI/Ingame/ChatSystem/ChatHandlers.lua)
@@ -1224,6 +1236,7 @@ local function OnEditorSceneStateChange(oldState, newState)
         HT.HideGridOverlay()
         HT.RefreshColorPickerVisibility()
         HT.HideLayoutDialogs()
+        HT.ApplyAllElementAppearances()
     end
 end
 
@@ -1247,9 +1260,14 @@ local function OnAddOnLoaded(_, addonName)
     HT.buildSettingsMenu()
 
     -- Create controls etc.
+    HT.InitializeElementAppearance()
+    HT.InitializeExtraHudElements()
+    HT.InitializeResourceBarGroup()
+
     HT.InstallInfoBoxControls()
     HT.InstallColorPicker()
     HT.InstallLayoutInfoBoxSection()
+    HT.InstallAppearanceInfoBoxSection()
     HT.InitializeHudLayouts()
 
     -- Scenes and hooks
