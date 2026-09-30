@@ -30,11 +30,11 @@ HT.APPEARANCE_FONT_OUTLINES =
 
 local GAME_FONT_FACE_CHOICES =
 {
-    { face = "$(MEDIUM_FONT)", stringId = "SI_HUDITORTOOLS_APPEARANCE_FONT_MEDIUM" },
-    { face = "$(BOLD_FONT)", stringId = "SI_HUDITORTOOLS_APPEARANCE_FONT_BOLD" },
-    { face = "$(ANTIQUE_FONT)", stringId = "SI_HUDITORTOOLS_APPEARANCE_FONT_ANTIQUE" },
+    { face = "$(MEDIUM_FONT)",         stringId = "SI_HUDITORTOOLS_APPEARANCE_FONT_MEDIUM"         },
+    { face = "$(BOLD_FONT)",           stringId = "SI_HUDITORTOOLS_APPEARANCE_FONT_BOLD"           },
+    { face = "$(ANTIQUE_FONT)",        stringId = "SI_HUDITORTOOLS_APPEARANCE_FONT_ANTIQUE"        },
     { face = "$(GAMEPAD_MEDIUM_FONT)", stringId = "SI_HUDITORTOOLS_APPEARANCE_FONT_GAMEPAD_MEDIUM" },
-    { face = "$(GAMEPAD_BOLD_FONT)", stringId = "SI_HUDITORTOOLS_APPEARANCE_FONT_GAMEPAD_BOLD" },
+    { face = "$(GAMEPAD_BOLD_FONT)",   stringId = "SI_HUDITORTOOLS_APPEARANCE_FONT_GAMEPAD_BOLD"   },
 }
 
 local editorScaleHooksInstalled = false
@@ -347,9 +347,9 @@ local function AnchorsMatchAppliedOffset(currentAnchors, baseAnchors, appliedOff
         local currentAnchor = currentAnchors[anchorIndex]
         local baseAnchor = baseAnchors[anchorIndex]
         if currentAnchor.point ~= baseAnchor.point
-            or currentAnchor.relativeTo ~= baseAnchor.relativeTo
-            or currentAnchor.relativePoint ~= baseAnchor.relativePoint
-            or currentAnchor.anchorConstrains ~= baseAnchor.anchorConstrains then
+        or currentAnchor.relativeTo ~= baseAnchor.relativeTo
+        or currentAnchor.relativePoint ~= baseAnchor.relativePoint
+        or currentAnchor.anchorConstrains ~= baseAnchor.anchorConstrains then
             return false
         end
         if zo_abs(currentAnchor.offsetX - baseAnchor.offsetX) > ANCHOR_OFFSET_MATCH_EPSILON then
@@ -513,13 +513,14 @@ function HT.StepSelectedElementScale(editorElement, direction)
         scale = HT.APPEARANCE_SCALE_STEP
     end
     scale = zo_roundToNearest(scale, HT.APPEARANCE_SCALE_STEP)
-    HT.SetAppearanceRow(saveKey, {
-        scale = scale,
-        fontFace = row.fontFace,
-        fontSize = row.fontSize,
-        fontOutline = row.fontOutline,
-        labelOffsetY = row.labelOffsetY,
-    })
+    HT.SetAppearanceRow(saveKey,
+                        {
+                            scale = scale,
+                            fontFace = row.fontFace,
+                            fontSize = row.fontSize,
+                            fontOutline = row.fontOutline,
+                            labelOffsetY = row.labelOffsetY,
+                        })
     HT.ApplyElementAppearance(elementData)
     editorElement:RefreshAnchors()
     HT.RefreshAppearanceInfoBox()

@@ -800,36 +800,41 @@ local function getHUDEditorInfoBoxSettingsContextMenu()
     }
     addCustomScrollableSubMenuEntry("Colors", colorSlotSubmenu)
     addCustomScrollableMenuHeader(GetString(SI_HUDITORTOOLS_LAYOUTS))
-    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_SAVE), function()
+    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_SAVE), function ()
                                      HT.SaveActiveLayout()
-                                 end, LSM_ENTRY_TYPE_NORMAL, {
+                                 end, LSM_ENTRY_TYPE_NORMAL,
+                                 {
                                      tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_SAVE_TOOLTIP),
-                                     enabled = function()
+                                     enabled = function ()
                                          return HT.IsLiveLayoutDirty()
                                      end,
                                  })
-    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_NEW), function()
+    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_NEW), function ()
                                      HT.ShowLayoutNameDialog("new")
-                                 end, LSM_ENTRY_TYPE_NORMAL, {
+                                 end, LSM_ENTRY_TYPE_NORMAL,
+                                 {
                                      tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_NEW_TOOLTIP),
                                  })
-    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_IMPORT), function()
+    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_IMPORT), function ()
                                      HT.ShowLayoutImportDialog()
-                                 end, LSM_ENTRY_TYPE_NORMAL, {
+                                 end, LSM_ENTRY_TYPE_NORMAL,
+                                 {
                                      tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_IMPORT_TOOLTIP),
                                  })
-    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_EXPORT), function()
+    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_EXPORT), function ()
                                      HT.ShowLayoutExportDialog()
-                                 end, LSM_ENTRY_TYPE_NORMAL, {
+                                 end, LSM_ENTRY_TYPE_NORMAL,
+                                 {
                                      tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_EXPORT_TOOLTIP),
                                  })
-    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_RENAME), function()
+    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_RENAME), function ()
                                      HT.ShowLayoutNameDialog("rename")
                                  end, LSM_ENTRY_TYPE_NORMAL)
-    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_DELETE), function()
+    addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_DELETE), function ()
                                      HT.ShowLayoutDeleteConfirmation()
-                                 end, LSM_ENTRY_TYPE_NORMAL, {
-                                     enabled = function()
+                                 end, LSM_ENTRY_TYPE_NORMAL,
+                                 {
+                                     enabled = function ()
                                          return HT.CountAllLayoutsForCharacter() > 1
                                      end,
                                  })

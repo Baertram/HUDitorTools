@@ -189,7 +189,8 @@ end
 
 local function CurrentAppearanceRow(elementData)
     local row = HT.GetAppearanceRow(elementData:GetSaveKey()) or {}
-    return {
+    return
+    {
         scale = tonumber(row.scale) or 1,
         fontFace = row.fontFace or "",
         fontSize = tonumber(row.fontSize) or HT.APPEARANCE_FONT_SIZE_DEFAULT,

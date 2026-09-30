@@ -51,7 +51,7 @@ function HT.buildSettingsMenu()
     local lamSettingsPanelName = HT.eventName .. "_LAM"
     HT.LAMSettingsPanel = LAM:RegisterAddonPanel(lamSettingsPanelName, panelData)
 
-    CALLBACK_MANAGER:RegisterCallback("LAM-PanelOpened", function(panel)
+    CALLBACK_MANAGER:RegisterCallback("LAM-PanelOpened", function (panel)
         if panel == HT.LAMSettingsPanel then
             HT.RefreshLamLayoutDropdown()
         end
@@ -189,10 +189,10 @@ function HT.buildSettingsMenu()
             tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_LAM_ACTIVE_TOOLTIP),
             choices = lamLayoutChoices,
             choicesValues = lamLayoutChoiceValues,
-            getFunc = function()
+            getFunc = function ()
                 return HT.GetActiveLayoutChoiceValue()
             end,
-            setFunc = function(value)
+            setFunc = function (value)
                 HT.SwitchHudLayoutFromChoiceValue(value)
             end,
             scrollable = true,
@@ -203,10 +203,10 @@ function HT.buildSettingsMenu()
             type = "checkbox",
             name = GetString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT),
             tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_LAM_CHAT_TOOLTIP),
-            getFunc = function()
+            getFunc = function ()
                 return settings.showChatMessages
             end,
-            setFunc = function(value)
+            setFunc = function (value)
                 settings.showChatMessages = value
             end,
             default = defaults.showChatMessages,
@@ -216,10 +216,10 @@ function HT.buildSettingsMenu()
             type = "button",
             name = GetString(SI_HUDITORTOOLS_LAYOUT_SAVE),
             tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_SAVE_TOOLTIP),
-            func = function()
+            func = function ()
                 HT.SaveActiveLayout()
             end,
-            disabled = function()
+            disabled = function ()
                 return not HT.IsLiveLayoutDirty()
             end,
             width = "half",
@@ -228,7 +228,7 @@ function HT.buildSettingsMenu()
             type = "button",
             name = GetString(SI_HUDITORTOOLS_LAYOUT_NEW),
             tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_NEW_TOOLTIP),
-            func = function()
+            func = function ()
                 HT.ShowLayoutNameDialog("new")
             end,
             width = "half",
@@ -237,7 +237,7 @@ function HT.buildSettingsMenu()
             type = "button",
             name = GetString(SI_HUDITORTOOLS_LAYOUT_IMPORT),
             tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_IMPORT_TOOLTIP),
-            func = function()
+            func = function ()
                 HT.ShowLayoutImportDialog()
             end,
             width = "half",
@@ -246,7 +246,7 @@ function HT.buildSettingsMenu()
             type = "button",
             name = GetString(SI_HUDITORTOOLS_LAYOUT_EXPORT),
             tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_EXPORT_TOOLTIP),
-            func = function()
+            func = function ()
                 HT.ShowLayoutExportDialog()
             end,
             width = "half",

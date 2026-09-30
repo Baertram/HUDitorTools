@@ -523,16 +523,16 @@ function HT.DecodeHudLayoutString(sourceString)
         return nil, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_MAGIC)
     end
     local formatVersion = tonumber(tokens[2])
-    if formatVersion ~= HT.HUDT_FORMAT_VERSION
-        and formatVersion ~= HT.HUDT_FORMAT_VERSION_V1
-        and formatVersion ~= HT.HUDT_FORMAT_VERSION_V2
-        and formatVersion ~= HT.HUDT_FORMAT_VERSION_V3 then
+    if  formatVersion ~= HT.HUDT_FORMAT_VERSION
+    and formatVersion ~= HT.HUDT_FORMAT_VERSION_V1
+    and formatVersion ~= HT.HUDT_FORMAT_VERSION_V2
+    and formatVersion ~= HT.HUDT_FORMAT_VERSION_V3 then
         return nil, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_VERSION)
     end
     local keyboardCount = tonumber(tokens[3])
     local gamepadCount = tonumber(tokens[4])
     if keyboardCount == nil or gamepadCount == nil or keyboardCount < 0 or gamepadCount < 0
-        or keyboardCount ~= zo_floor(keyboardCount) or gamepadCount ~= zo_floor(gamepadCount) then
+    or keyboardCount ~= zo_floor(keyboardCount) or gamepadCount ~= zo_floor(gamepadCount) then
         return nil, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_NUMBER)
     end
 
@@ -563,12 +563,13 @@ function HT.DecodeHudLayoutString(sourceString)
         if endIndex <= #tokens then
             return nil, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_TRAILING)
         end
-        return {
-            keyboardElements = keyboardElements,
-            gamepadElements = gamepadElements,
-            elementAppearance = elementAppearance,
-            resourceBarGroup = resourceBarGroup,
-        }, nil
+        return
+            {
+                keyboardElements = keyboardElements,
+                gamepadElements = gamepadElements,
+                elementAppearance = elementAppearance,
+                resourceBarGroup = resourceBarGroup,
+            }, nil
     end
 
     if tokens[endIndex] ~= "A" then
@@ -611,19 +612,20 @@ function HT.DecodeHudLayoutString(sourceString)
         return nil, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_TRAILING)
     end
 
-    return {
-        keyboardElements = keyboardElements,
-        gamepadElements = gamepadElements,
-        elementAppearance =
+    return
         {
-            keyboard = keyboardAppearance,
-            gamepad = gamepadAppearance,
-        },
-        resourceBarGroup =
-        {
-            enabled = enabledToken == "1",
-            healthWidth = healthWidth,
-            preventExpand = preventExpand,
-        },
-    }, nil
+            keyboardElements = keyboardElements,
+            gamepadElements = gamepadElements,
+            elementAppearance =
+            {
+                keyboard = keyboardAppearance,
+                gamepad = gamepadAppearance,
+            },
+            resourceBarGroup =
+            {
+                enabled = enabledToken == "1",
+                healthWidth = healthWidth,
+                preventExpand = preventExpand,
+            },
+        }, nil
 end

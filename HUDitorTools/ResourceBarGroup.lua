@@ -43,7 +43,8 @@ function HT.CopyResourceBarGroup(sourceGroup)
         healthWidth = ClampHealthWidth(sourceGroup.healthWidth)
         preventExpand = sourceGroup.preventExpand == true
     end
-    return {
+    return
+    {
         enabled = enabled,
         healthWidth = healthWidth,
         preventExpand = preventExpand,

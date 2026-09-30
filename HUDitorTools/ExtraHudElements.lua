@@ -216,8 +216,8 @@ end
 local function OnPlayerActivated()
     HT.RegisterExtraHudElements()
     zo_callLater(function ()
-        HT.RegisterExtraHudElements()
-    end, 0)
+                     HT.RegisterExtraHudElements()
+                 end, 0)
 end
 
 function HT.InitializeExtraHudElements()
