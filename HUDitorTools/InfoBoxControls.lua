@@ -153,6 +153,10 @@ local function GetFontSizeEdit()
     return appearanceSection:GetNamedChild("FontSizeRow"):GetNamedChild("Backdrop"):GetNamedChild("Edit")
 end
 
+local function GetLabelOffsetEdit()
+    return appearanceSection:GetNamedChild("LabelOffsetRow"):GetNamedChild("Backdrop"):GetNamedChild("Edit")
+end
+
 local function GetResourceWidthEdit()
     return appearanceSection:GetNamedChild("ResourceGroup"):GetNamedChild("WidthRow"):GetNamedChild("Backdrop"):GetNamedChild("Edit")
 end
@@ -192,6 +196,7 @@ local function CurrentAppearanceRow(elementData)
         fontFace = row.fontFace or "",
         fontSize = tonumber(row.fontSize) or HT.APPEARANCE_FONT_SIZE_DEFAULT,
         fontOutline = row.fontOutline or HT.GetDefaultFontOutline(),
+        labelOffsetY = HT.ClampAppearanceLabelOffsetY(row.labelOffsetY),
     }
 end
 
@@ -226,6 +231,14 @@ local function ApplyFontSizeFromEdit(elementData)
     GetFontSizeEdit():SetText(tostring(fontSize))
     local row = CurrentAppearanceRow(elementData)
     row.fontSize = fontSize
+    CommitAppearanceRow(elementData, row)
+end
+
+local function ApplyLabelOffsetFromEdit(elementData)
+    local labelOffsetY = HT.ClampAppearanceLabelOffsetY(GetLabelOffsetEdit():GetText())
+    GetLabelOffsetEdit():SetText(tostring(labelOffsetY))
+    local row = CurrentAppearanceRow(elementData)
+    row.labelOffsetY = labelOffsetY
     CommitAppearanceRow(elementData, row)
 end
 
@@ -302,6 +315,7 @@ function HT.RefreshAppearanceInfoBox()
     local row = CurrentAppearanceRow(elementData)
     GetScaleEdit():SetText(tostring(zo_round(row.scale * 100)))
     GetFontSizeEdit():SetText(tostring(row.fontSize))
+    GetLabelOffsetEdit():SetText(tostring(row.labelOffsetY))
     UpdateOptionalAppearanceRows(row.fontFace)
 
     local fontValues, fontLabels = HT.GetFontFaceChoices()
@@ -389,6 +403,17 @@ local function CreateAppearanceSection()
     end)
     fontSizeEdit:SetHandler("OnEnter", function ()
         fontSizeEdit:LoseFocus()
+    end)
+
+    local labelOffsetEdit = GetLabelOffsetEdit()
+    labelOffsetEdit:SetHandler("OnFocusLost", function ()
+        local elementData = GetSelectedElementData()
+        if elementData then
+            ApplyLabelOffsetFromEdit(elementData)
+        end
+    end)
+    labelOffsetEdit:SetHandler("OnEnter", function ()
+        labelOffsetEdit:LoseFocus()
     end)
 
     appearanceSection:GetNamedChild("Reset"):SetHandler("OnClicked", function ()

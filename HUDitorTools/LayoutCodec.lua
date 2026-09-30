@@ -6,9 +6,10 @@
 -- -----------------------------------------------------------------------------
 local HT = HUDitorTools
 
-HT.HUDT_FORMAT_VERSION = 3
+HT.HUDT_FORMAT_VERSION = 4
 HT.HUDT_FORMAT_VERSION_V1 = 1
 HT.HUDT_FORMAT_VERSION_V2 = 2
+HT.HUDT_FORMAT_VERSION_V3 = 3
 HT.HUDT_MAGIC = "HUDT"
 
 -- Offset precision matches ZO_HUDManager:SaveAnchorOffsets (hudmanager.lua)
@@ -414,10 +415,11 @@ local function EncodeAppearanceMap(modeMap, tokens)
         tokens[#tokens + 1] = EscapeTextToken(row.fontFace or "")
         tokens[#tokens + 1] = tostring(zo_floor(tonumber(row.fontSize) or HT.APPEARANCE_FONT_SIZE_DEFAULT))
         tokens[#tokens + 1] = EscapeTextToken(row.fontOutline or "")
+        tokens[#tokens + 1] = tostring(HT.ClampAppearanceLabelOffsetY(row.labelOffsetY))
     end
 end
 
-local function DecodeAppearanceMap(tokens, tokenIndex)
+local function DecodeAppearanceMap(tokens, tokenIndex, formatVersion)
     local countToken = tokens[tokenIndex]
     if countToken == nil then
         return nil, tokenIndex, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_TRUNCATED)
@@ -446,14 +448,29 @@ local function DecodeAppearanceMap(tokens, tokenIndex)
         if scale == nil or fontSize == nil then
             return nil, tokenIndex, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_NUMBER)
         end
+        local labelOffsetY = 0
+        local tokensPerRow = 5
+        -- v4 appearance rows append labelOffsetY as the sixth token.
+        if formatVersion > HT.HUDT_FORMAT_VERSION_V3 then
+            local labelOffsetToken = tokens[tokenIndex + 5]
+            if labelOffsetToken == nil then
+                return nil, tokenIndex, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_TRUNCATED)
+            end
+            labelOffsetY = tonumber(labelOffsetToken)
+            if labelOffsetY == nil then
+                return nil, tokenIndex, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_NUMBER)
+            end
+            tokensPerRow = 6
+        end
         modeMap[saveKey] =
         {
             scale = scale,
             fontFace = UnescapeTextToken(fontFaceToken),
             fontSize = fontSize,
             fontOutline = UnescapeTextToken(fontOutlineToken),
+            labelOffsetY = labelOffsetY,
         }
-        tokenIndex = tokenIndex + 5
+        tokenIndex = tokenIndex + tokensPerRow
     end
     return modeMap, tokenIndex, nil
 end
@@ -508,7 +525,8 @@ function HT.DecodeHudLayoutString(sourceString)
     local formatVersion = tonumber(tokens[2])
     if formatVersion ~= HT.HUDT_FORMAT_VERSION
         and formatVersion ~= HT.HUDT_FORMAT_VERSION_V1
-        and formatVersion ~= HT.HUDT_FORMAT_VERSION_V2 then
+        and formatVersion ~= HT.HUDT_FORMAT_VERSION_V2
+        and formatVersion ~= HT.HUDT_FORMAT_VERSION_V3 then
         return nil, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_VERSION)
     end
     local keyboardCount = tonumber(tokens[3])
@@ -556,11 +574,11 @@ function HT.DecodeHudLayoutString(sourceString)
     if tokens[endIndex] ~= "A" then
         return nil, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_EXTRA)
     end
-    local keyboardAppearance, appearanceIndex, keyboardAppearanceError = DecodeAppearanceMap(tokens, endIndex + 1)
+    local keyboardAppearance, appearanceIndex, keyboardAppearanceError = DecodeAppearanceMap(tokens, endIndex + 1, formatVersion)
     if keyboardAppearanceError then
         return nil, keyboardAppearanceError
     end
-    local gamepadAppearance, resourceIndex, gamepadAppearanceError = DecodeAppearanceMap(tokens, appearanceIndex)
+    local gamepadAppearance, resourceIndex, gamepadAppearanceError = DecodeAppearanceMap(tokens, appearanceIndex, formatVersion)
     if gamepadAppearanceError then
         return nil, gamepadAppearanceError
     end
@@ -578,7 +596,7 @@ function HT.DecodeHudLayoutString(sourceString)
     end
     local preventExpand = false
     local trailingIndex = resourceIndex + 3
-    if formatVersion == HT.HUDT_FORMAT_VERSION then
+    if formatVersion >= HT.HUDT_FORMAT_VERSION_V3 then
         local preventExpandToken = tokens[resourceIndex + 3]
         if preventExpandToken == nil then
             return nil, GetString(SI_HUDITORTOOLS_LAYOUT_CODEC_ERROR_TRUNCATED)

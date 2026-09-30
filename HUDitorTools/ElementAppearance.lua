@@ -1,14 +1,17 @@
 -- -----------------------------------------------------------------------------
--- HUDitorTools - per-element scale and font for HUD_MANAGER elements
+-- HUDitorTools - per-element scale, font, and label offset for HUD_MANAGER elements
 -- Scale: Control:SetScale. Font: LabelControl:SetFont / GetFont.
--- Reapply after ZO_HUDManager:PropagateSettings (hudmanager.lua) and when
--- the hud_editor_keyboard scene hides. SetScale is only on the HUD control.
+-- Label offset: Control:GetAnchor / ClearAnchors / SetAnchor. Positive offsetY
+-- moves text down. Reapply after ZO_HUDManager:PropagateSettings (hudmanager.lua)
+-- and when the hud_editor_keyboard scene hides. SetScale is only on the HUD control.
 -- The editor box stays the unscaled hudElementRef size from RefreshAnchors.
 -- -----------------------------------------------------------------------------
 local HT = HUDitorTools
 
 HT.APPEARANCE_SCALE_STEP = 0.01
 HT.APPEARANCE_FONT_SIZE_DEFAULT = 18
+HT.APPEARANCE_LABEL_OFFSET_Y_MIN = -32
+HT.APPEARANCE_LABEL_OFFSET_Y_MAX = 32
 HT.APPEARANCE_FONT_OUTLINE_WITH_MEDIA = "soft-shadow-thick"
 HT.APPEARANCE_FONT_OUTLINE_GAME = "soft-shadow-thin"
 
@@ -35,7 +38,9 @@ local GAME_FONT_FACE_CHOICES =
 local editorScaleHooksInstalled = false
 local applyingAllAppearances = false
 local saveKeysWithFontApplied = {}
+local saveKeysWithLabelOffset = {}
 local appliedFontLabelsBySaveKey = {}
+local ANCHOR_OFFSET_MATCH_EPSILON = 0.01
 local controlsApplyingAppearance = {}
 local shownHookInstalled = {}
 
@@ -60,6 +65,21 @@ local function ReadFontSize(fontSize)
         return 1
     end
     return fontSize
+end
+
+function HT.ClampAppearanceLabelOffsetY(labelOffsetY)
+    labelOffsetY = tonumber(labelOffsetY)
+    if labelOffsetY == nil then
+        return 0
+    end
+    labelOffsetY = zo_floor(labelOffsetY)
+    if labelOffsetY < HT.APPEARANCE_LABEL_OFFSET_Y_MIN then
+        return HT.APPEARANCE_LABEL_OFFSET_Y_MIN
+    end
+    if labelOffsetY > HT.APPEARANCE_LABEL_OFFSET_Y_MAX then
+        return HT.APPEARANCE_LABEL_OFFSET_Y_MAX
+    end
+    return labelOffsetY
 end
 
 function HT.GetAppearanceInputModeKey()
@@ -96,6 +116,7 @@ function HT.CopyElementAppearance(sourceAppearance)
                         fontFace = row.fontFace or "",
                         fontSize = tonumber(row.fontSize) or HT.APPEARANCE_FONT_SIZE_DEFAULT,
                         fontOutline = row.fontOutline or "",
+                        labelOffsetY = HT.ClampAppearanceLabelOffsetY(row.labelOffsetY),
                     }
                 end
             end
@@ -144,6 +165,9 @@ function HT.IsAppearanceRowDefault(row)
     if fontFace ~= "" then
         return false
     end
+    if HT.ClampAppearanceLabelOffsetY(row.labelOffsetY) ~= 0 then
+        return false
+    end
     return true
 end
 
@@ -162,6 +186,7 @@ function HT.SetAppearanceRow(saveKey, row, inputModeKey)
         fontFace = row.fontFace or "",
         fontSize = ReadFontSize(row.fontSize),
         fontOutline = row.fontOutline or HT.GetDefaultFontOutline(),
+        labelOffsetY = HT.ClampAppearanceLabelOffsetY(row.labelOffsetY),
     }
 end
 
@@ -294,6 +319,88 @@ local function RestoreFontStringOnLabels(control, saveKey)
     end)
 end
 
+-- GetAnchor(anchorIndex) returns isValidAnchor, point, relativeTo, relativePoint,
+-- offsetX, offsetY, anchorConstrains. ESOUIDocumentation.txt Control methods.
+local function CaptureLabelAnchors(label)
+    local anchors = {}
+    local anchorCount = label:GetNumAnchors()
+    for anchorIndex = 0, anchorCount - 1 do
+        local isValidAnchor, point, relativeTo, relativePoint, offsetX, offsetY, anchorConstrains = label:GetAnchor(anchorIndex)
+        if isValidAnchor then
+            anchors[#anchors + 1] =
+            {
+                point = point,
+                relativeTo = relativeTo,
+                relativePoint = relativePoint,
+                offsetX = offsetX,
+                offsetY = offsetY,
+                anchorConstrains = anchorConstrains,
+            }
+        end
+    end
+    return anchors
+end
+
+local function AnchorsMatchAppliedOffset(currentAnchors, baseAnchors, appliedOffsetY)
+    if #currentAnchors ~= #baseAnchors then
+        return false
+    end
+    for anchorIndex = 1, #currentAnchors do
+        local currentAnchor = currentAnchors[anchorIndex]
+        local baseAnchor = baseAnchors[anchorIndex]
+        if currentAnchor.point ~= baseAnchor.point
+            or currentAnchor.relativeTo ~= baseAnchor.relativeTo
+            or currentAnchor.relativePoint ~= baseAnchor.relativePoint
+            or currentAnchor.anchorConstrains ~= baseAnchor.anchorConstrains then
+            return false
+        end
+        if zo_abs(currentAnchor.offsetX - baseAnchor.offsetX) > ANCHOR_OFFSET_MATCH_EPSILON then
+            return false
+        end
+        local expectedOffsetY = baseAnchor.offsetY + appliedOffsetY
+        if zo_abs(currentAnchor.offsetY - expectedOffsetY) > ANCHOR_OFFSET_MATCH_EPSILON then
+            return false
+        end
+    end
+    return true
+end
+
+local function WriteLabelAnchors(label, baseAnchors, labelOffsetY)
+    label:ClearAnchors()
+    for anchorIndex = 1, #baseAnchors do
+        local baseAnchor = baseAnchors[anchorIndex]
+        local offsetY = baseAnchor.offsetY + labelOffsetY
+        if baseAnchor.anchorConstrains ~= nil then
+            label:SetAnchor(baseAnchor.point, baseAnchor.relativeTo, baseAnchor.relativePoint, baseAnchor.offsetX, offsetY, baseAnchor.anchorConstrains)
+        else
+            label:SetAnchor(baseAnchor.point, baseAnchor.relativeTo, baseAnchor.relativePoint, baseAnchor.offsetX, offsetY)
+        end
+    end
+end
+
+local function ApplyLabelOffsetY(label, labelOffsetY)
+    local currentAnchors = CaptureLabelAnchors(label)
+    if #currentAnchors == 0 then
+        return
+    end
+    local baseAnchors = label.huditorToolsLabelAnchorBase
+    local appliedOffsetY = label.huditorToolsAppliedLabelOffsetY or 0
+    if not baseAnchors or not AnchorsMatchAppliedOffset(currentAnchors, baseAnchors, appliedOffsetY) then
+        baseAnchors = currentAnchors
+        label.huditorToolsLabelAnchorBase = baseAnchors
+    end
+    WriteLabelAnchors(label, baseAnchors, labelOffsetY)
+    label.huditorToolsAppliedLabelOffsetY = labelOffsetY
+end
+
+local function ApplyLabelOffsetToControl(control, labelOffsetY)
+    VisitLabels(control, function (label)
+        if labelOffsetY ~= 0 or label.huditorToolsLabelAnchorBase then
+            ApplyLabelOffsetY(label, labelOffsetY)
+        end
+    end)
+end
+
 local function InstallShownHook(control, element)
     local controlName = control:GetName()
     if controlName == "" or shownHookInstalled[controlName] then
@@ -320,11 +427,13 @@ function HT.ApplyElementAppearance(element)
     local fontFace = ""
     local fontSize = HT.APPEARANCE_FONT_SIZE_DEFAULT
     local fontOutline = HT.GetDefaultFontOutline()
+    local labelOffsetY = 0
     if row then
         scale = ReadScale(row.scale)
         fontFace = row.fontFace or ""
         fontSize = ReadFontSize(row.fontSize)
         fontOutline = row.fontOutline or fontOutline
+        labelOffsetY = HT.ClampAppearanceLabelOffsetY(row.labelOffsetY)
     end
     local currentScale = control:GetScale() or 1
     if zo_abs(currentScale - scale) >= 0.001 then
@@ -339,6 +448,13 @@ function HT.ApplyElementAppearance(element)
     elseif saveKeysWithFontApplied[saveKey] then
         RestoreFontStringOnLabels(control, saveKey)
         saveKeysWithFontApplied[saveKey] = nil
+    end
+    if labelOffsetY ~= 0 then
+        ApplyLabelOffsetToControl(control, labelOffsetY)
+        saveKeysWithLabelOffset[saveKey] = true
+    elseif saveKeysWithLabelOffset[saveKey] then
+        ApplyLabelOffsetToControl(control, 0)
+        saveKeysWithLabelOffset[saveKey] = nil
     end
     if row and not HT.IsAppearanceRowDefault(row) then
         InstallShownHook(control, element)
@@ -355,20 +471,34 @@ function HT.ApplyAllElementAppearances()
         HT.ApplyResourceBarGroup()
     end
     local modeMap = HT.GetAppearanceMap()
+    local function ApplySavedAppearance(saveKey)
+        local control = _G[saveKey]
+        if type(control) ~= "userdata" then
+            return
+        end
+        local element
+        if IsInGamepadPreferredMode() then
+            element = HUD_MANAGER:GetGamepadElementForControl(control)
+        else
+            element = HUD_MANAGER:GetKeyboardElementForControl(control)
+        end
+        if element then
+            HT.ApplyElementAppearance(element)
+        end
+    end
     for saveKey, row in pairs(modeMap) do
         if not HT.IsAppearanceRowDefault(row) then
-            local control = _G[saveKey]
-            if type(control) == "userdata" then
-                local element
-                if IsInGamepadPreferredMode() then
-                    element = HUD_MANAGER:GetGamepadElementForControl(control)
-                else
-                    element = HUD_MANAGER:GetKeyboardElementForControl(control)
-                end
-                if element then
-                    HT.ApplyElementAppearance(element)
-                end
-            end
+            ApplySavedAppearance(saveKey)
+        end
+    end
+    local labelOffsetSaveKeys = {}
+    for saveKey in pairs(saveKeysWithLabelOffset) do
+        labelOffsetSaveKeys[#labelOffsetSaveKeys + 1] = saveKey
+    end
+    for saveKeyIndex = 1, #labelOffsetSaveKeys do
+        local saveKey = labelOffsetSaveKeys[saveKeyIndex]
+        if HT.IsAppearanceRowDefault(modeMap[saveKey]) then
+            ApplySavedAppearance(saveKey)
         end
     end
     applyingAllAppearances = false
@@ -391,6 +521,7 @@ function HT.StepSelectedElementScale(editorElement, direction)
         fontFace = row.fontFace,
         fontSize = row.fontSize,
         fontOutline = row.fontOutline,
+        labelOffsetY = row.labelOffsetY,
     })
     HT.ApplyElementAppearance(elementData)
     if editorElement.RefreshAnchors then
