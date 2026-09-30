@@ -135,11 +135,9 @@ local outlineComboBox
 local suppressAppearanceComboCallback = false
 
 local function GetSelectedElementData()
-    if not HE_KB or not HE_KB.GetSelectedElement then
-        return nil
-    end
+    -- ZO_HUDEditor_Keyboard:GetSelectedElement / ZO_HUDEditorElement_Keyboard:GetElementData
     local selectedElement = HE_KB:GetSelectedElement()
-    if not selectedElement or not selectedElement.GetElementData then
+    if not selectedElement then
         return nil
     end
     return selectedElement:GetElementData()
@@ -204,12 +202,10 @@ local function CommitAppearanceRow(elementData, row)
     HT.SetAppearanceRow(elementData:GetSaveKey(), row)
     HT.ApplyElementAppearance(elementData)
     local selectedElement = HE_KB:GetSelectedElement()
-    if selectedElement and selectedElement.RefreshAnchors then
+    if selectedElement then
         selectedElement:RefreshAnchors()
     end
-    if HT.RefreshLayoutInfoBoxSection then
-        HT.RefreshLayoutInfoBoxSection()
-    end
+    HT.RefreshLayoutInfoBoxSection()
 end
 
 local function ApplyScaleFromEdit(elementData)
@@ -424,13 +420,11 @@ local function CreateAppearanceSection()
         HT.SetAppearanceRow(elementData:GetSaveKey(), nil)
         HT.ApplyElementAppearance(elementData)
         local selectedElement = HE_KB:GetSelectedElement()
-        if selectedElement and selectedElement.RefreshAnchors then
+        if selectedElement then
             selectedElement:RefreshAnchors()
         end
         HT.RefreshAppearanceInfoBox()
-        if HT.RefreshLayoutInfoBoxSection then
-            HT.RefreshLayoutInfoBoxSection()
-        end
+        HT.RefreshLayoutInfoBoxSection()
     end)
 
     local resourceGroup = appearanceSection:GetNamedChild("ResourceGroup")

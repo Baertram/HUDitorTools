@@ -192,8 +192,8 @@ local getValueOrCallback = LSM.Util.getValueOrCallback
 --- Local helper functions
 ------------------------------------------------------------------------------------------------------------------------
 local function colorizeString(r, g, b, string)
-    if ZO_ColorizeString then return ZO_ColorizeString(r, g, b, string) end -- sometimes this is nil all of sudden?
-    return string.format("|c%.2x%.2x%.2x%s|r", math.floor(r * 255), math.floor(g * 255), math.floor(b * 255), string)
+    -- ZO_ColorizeString is defined in EsoUI/App/Globals/Globals.lua
+    return ZO_ColorizeString(r, g, b, string)
 end
 
 
@@ -220,7 +220,8 @@ local function getElementRealTLCName(elementCtrl, elementObject)
     elementObject = elementObject or getElementObject(elementCtrl)
     local elementData = getElementData(elementCtrl, elementObject)
     if elementData == nil or elementObject == nil then return nil, nil, nil end
-    local TLCName = ((elementData:GetSaveKey()) or (elementData.control and elementData.control.GetName and elementData.control:GetName())) or nil
+    -- ZO_HUDManager_Element:GetSaveKey is control:GetName() (HUDManager.lua Initialize).
+    local TLCName = elementData:GetSaveKey()
     return TLCName, elementObject, elementData
 end
 
@@ -236,65 +237,59 @@ local function addButton(myAnchorPoint, relativeTo, relativePoint, offsetX, offs
         -- Create the button control at the parent
         button = WM:CreateControl(btnName, buttonData.parentControl, CT_BUTTON)
     end
-    -- Button was created?
-    if button ~= nil then
-        -- d(">button created")
-        -- Set the button's size
-        button:SetDimensions(buttonData.width or 32, buttonData.height or 32)
+    button:SetDimensions(buttonData.width or 32, buttonData.height or 32)
 
-        -- SetAnchor(point, relativeTo, relativePoint, offsetX, offsetY)
-        button:SetAnchor(myAnchorPoint, relativeTo, relativePoint, offsetX, offsetY)
+    -- SetAnchor(point, relativeTo, relativePoint, offsetX, offsetY)
+    button:SetAnchor(myAnchorPoint, relativeTo, relativePoint, offsetX, offsetY)
 
-        -- Textures
-        if buttonData.normal then
-            button:SetNormalTexture(buttonData.normal)
-        end
-        if buttonData.pressed then
-            button:SetPressedTexture(buttonData.pressed)
-        end
-        if buttonData.highlight then
-            button:SetMouseOverTexture(buttonData.highlight)
-        end
-        if buttonData.disabled then
-            button:SetDisabledTexture(buttonData.disabled)
-        end
-
-        button.tooltipText = buttonData.tooltip
-        button.tooltipAlign = TOP
-        button:SetHandler("OnMouseEnter", function (self)
-            ZO_Tooltips_ShowTextTooltip(self, self.tooltipAlign, self.tooltipText)
-        end)
-        button:SetHandler("OnMouseExit", function (self)
-            ZO_Tooltips_HideTextTooltip()
-        end)
-        -- Set the callback function of the button
-        button:SetHandler("OnClicked", function (...)
-            buttonData.callback(...)
-        end)
-
-        local isHidden = false
-        local buttonVisibleType = type(buttonData.visible)
-        if buttonVisibleType ~= nil then
-            if buttonVisibleType == "function" then
-                isHidden = not buttonData.visible()
-
-                if not parentsOnEffectivelyShownHooked[parent] then
-                    ZO_PostHookHandler(parent, "OnEffectivelyShown", function ()
-                        button:SetHidden(not buttonData.visible())
-                    end)
-                    parentsOnEffectivelyShownHooked[parent] = true
-                end
-            elseif buttonVisibleType == "boolean" then
-                isHidden = buttonData.visible
-            end
-        end
-        -- Show the button and make it react on mouse input
-        button:SetHidden(isHidden)
-        button:SetMouseEnabled(true)
-
-        -- Return the button control
-        return button
+    -- Textures
+    if buttonData.normal then
+        button:SetNormalTexture(buttonData.normal)
     end
+    if buttonData.pressed then
+        button:SetPressedTexture(buttonData.pressed)
+    end
+    if buttonData.highlight then
+        button:SetMouseOverTexture(buttonData.highlight)
+    end
+    if buttonData.disabled then
+        button:SetDisabledTexture(buttonData.disabled)
+    end
+
+    button.tooltipText = buttonData.tooltip
+    button.tooltipAlign = TOP
+    button:SetHandler("OnMouseEnter", function (self)
+        ZO_Tooltips_ShowTextTooltip(self, self.tooltipAlign, self.tooltipText)
+    end)
+    button:SetHandler("OnMouseExit", function (self)
+        ZO_Tooltips_HideTextTooltip()
+    end)
+    -- Set the callback function of the button
+    button:SetHandler("OnClicked", function (...)
+        buttonData.callback(...)
+    end)
+
+    local isHidden = false
+    local buttonVisibleType = type(buttonData.visible)
+    if buttonVisibleType ~= nil then
+        if buttonVisibleType == "function" then
+            isHidden = not buttonData.visible()
+
+            if not parentsOnEffectivelyShownHooked[parent] then
+                ZO_PostHookHandler(parent, "OnEffectivelyShown", function ()
+                    button:SetHidden(not buttonData.visible())
+                end)
+                parentsOnEffectivelyShownHooked[parent] = true
+            end
+        elseif buttonVisibleType == "boolean" then
+            isHidden = buttonData.visible
+        end
+    end
+    -- Show the button and make it react on mouse input
+    button:SetHidden(isHidden)
+    button:SetMouseEnabled(true)
+
+    return button
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -336,7 +331,7 @@ local function getElementControlByName(hiddenHUDElement)
     for _, element in ipairs(HE_KB.elementControls) do
         local elementData = getElementData(element)
         if elementData then
-            if elementData:GetSaveKey() == hiddenHUDElement or (elementData.control and elementData.control.GetName and elementData.control:GetName() == hiddenHUDElement) then
+            if elementData:GetSaveKey() == hiddenHUDElement then
                 return element
             end
         end
@@ -1091,7 +1086,9 @@ local function InstallEditorElementHooks()
         end
         offsetX, offsetY = HT.ApplySnap(tonumber(offsetX), tonumber(offsetY), HT.SV.gridSize)
         self.control:ClearAnchors()
-        self.control:SetAnchor(TOPLEFT, nil, nil, offsetX, offsetY)
+        -- "Nui" matches GridOverlay.FormatUiLayoutMeasurement so a snapped drag
+        -- does not put raw numbers back on the preview box.
+        self.control:SetAnchor(TOPLEFT, nil, nil, string.format("%dui", zo_round(offsetX)), string.format("%dui", zo_round(offsetY)))
         self:ApplyChanges()
         HE_KB.infoBoxXCoordsEditBox:SetText(tostring(offsetX))
         HE_KB.infoBoxYCoordsEditBox:SetText(tostring(offsetY))

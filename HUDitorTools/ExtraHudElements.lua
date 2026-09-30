@@ -28,9 +28,6 @@ local function GetOrCreateHudElementRef(control)
     end
 
     local ref = windowManager:CreateControl(control:GetName() .. "HUDElementRef", control, CT_CONTROL)
-    if not ref then
-        return nil
-    end
     ref:SetExcludeFromResizeToFitExtents(true)
     ref:ClearAnchors()
     ref:SetAnchor(CENTER)
@@ -68,10 +65,7 @@ local function PrepareControlForHudRegistration(control)
         defaultAnchor = ZO_Anchor:New(primaryPoint, relativeTo, relativePoint, offsetX, offsetY)
     end
 
-    if not GetOrCreateHudElementRef(control) then
-        return false, nil
-    end
-
+    GetOrCreateHudElementRef(control)
     return true, defaultAnchor
 end
 
@@ -212,16 +206,11 @@ local function RegisterSpec(spec)
 end
 
 function HT.RegisterExtraHudElements()
-    if not HUD_MANAGER or not HUD_MANAGER.RegisterKeyboardElement then
-        return
-    end
     local specs = GetExtraHudElementSpecs()
     for _, spec in ipairs(specs) do
         RegisterSpec(spec)
     end
-    if HT.ApplyAllElementAppearances then
-        HT.ApplyAllElementAppearances()
-    end
+    HT.ApplyAllElementAppearances()
 end
 
 local function OnPlayerActivated()
@@ -232,9 +221,6 @@ local function OnPlayerActivated()
 end
 
 function HT.InitializeExtraHudElements()
-    if not HUD_MANAGER or not HUD_MANAGER.RegisterCallback then
-        return
-    end
     if not preloadCallbackInstalled then
         preloadCallbackInstalled = true
         if HUD_MANAGER.savedVars then

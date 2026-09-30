@@ -22,7 +22,7 @@ function HT.RefreshLamLayoutDropdown()
     end
 
     local dropdownControl = _G[LAM_ACTIVE_LAYOUT_DROPDOWN_REFERENCE]
-    if not dropdownControl or not dropdownControl.UpdateChoices then
+    if not dropdownControl then
         return
     end
     dropdownControl:UpdateChoices(lamLayoutChoices, lamLayoutChoiceValues)
