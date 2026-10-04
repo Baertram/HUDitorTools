@@ -166,17 +166,18 @@ function HT.buildSettingsMenu()
             name = GetString(SI_HUDITORTOOLS_HUD_EDITOR_GRID_LINE_COLOR_LAM),
             tooltip = GetString(SI_HUDITORTOOLS_HUD_EDITOR_GRID_LINE_COLOR_LAM_TT),
             getFunc = function ()
-                local HUDEditGridColor = settings.gridColor
+                local HUDEditGridColor = settings[HT.COLOR_SLOT_GRID]
                 return HUDEditGridColor.r, HUDEditGridColor.g, HUDEditGridColor.b, HUDEditGridColor.a
             end,
             setFunc = function (r, g, b, a)
-                settings.gridColor = { r = r, g = g, b = b, a = a }
-                HT.HUDUI_UpdateColor("gridColor")
+                settings[HT.COLOR_SLOT_GRID] = { r = r, g = g, b = b, a = a }
+                HT.HUDUI_UpdateColor(HT.COLOR_SLOT_GRID)
             end,
             default = function ()
-                local defaultGridColor = defaults.gridColor
+                local defaultGridColor = defaults[HT.COLOR_SLOT_GRID]
                 return defaultGridColor.r, defaultGridColor.g, defaultGridColor.b, defaultGridColor.a
             end,
+            disabled = function () return not settings.showGrid end,
             width = "full",
         },
         {

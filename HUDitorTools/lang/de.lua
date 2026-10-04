@@ -124,6 +124,20 @@ local strings = {
     ["SI_HUDITORTOOLS_HUD_EDITOR_GRID_SIZE_LAM_TT"] = "Die Größe des Gitters",
     ["SI_HUDITORTOOLS_HUD_EDITOR_GRID_LINE_COLOR_LAM"] = "Gitter Linien Farbe",
     ["SI_HUDITORTOOLS_HUD_EDITOR_GRID_LINE_COLOR_LAM_TT"] = "Wähle die Farbe und Durchsichtigkeit der Gitter Linien aus",
+    --Context menu
+    ["SI_HUDITORTOOLS_CNTXT_SHOW_ALL_ELEMENTS"] = "Zeige alle Element-Namen an",
+    ["SI_HUDITORTOOLS_CNTXT_SHOW_ALL_ELEMENTS_TT"] = "Zeige immer alle Element-Namen an, nicht nur wenn die Maus darüber bewegt wird oder ein Eintrag aus der Info Box Liste ausgewählt wird.\nDiese Einstellung hängt von dem Schieberegler \'Verstecke Elemente <= Länge\' Wert ab.",
+    ["SI_HUDITORTOOLS_CNTXT_HIDE_ELEMENTS_LESS_LENGTH"] = "Verstecke Elemente <= Länge",
+    ["SI_HUDITORTOOLS_CNTXT_HIDE_ELEMENTS_LESS_LENGTH_TT"] = "\nVersteckt die Elemente, deren Namen kürzer/gleich des geählten Schieberegler Wertes ist.",
+    ["SI_HUDITORTOOLS_CNTXT_HIDDEN_ELEMENTS_COUNT"] = "HUD Bearbeiten - Versteckte Elemente (#%s)",
+    ["SI_HUDITORTOOLS_CNTXT_SHOW_ALL_HIDDEN_ELEMENTS"] = "Zeige alle versteckten Elemente wieder an",
+    ["SI_HUDITORTOOLS_CNTXT_SHOW_COLOR_PICKER"] = "Zeige Farb-Auswahl",
+    ["SI_HUDITORTOOLS_CNTXT_SHOW_COLOR_PICKER_TT"] = "Zeige einen Farb-Auswahl Dialog an mit welchem du ad-hoc die Farben der \'Benutzeroberfläche Ändern\' Optionen anpassen kannst (z.B. das Gitter, usw.).",
+    ["SI_HUDITORTOOLS_CNTXT_COLORS"] = "Farben",
+    ["SI_HUDITORTOOLS_COLOR_GRID"] = "Gitter",
+    ["SI_HUDITORTOOLS_COLOR_SELECTED"] = "Ausgewählt",
+    ["SI_HUDITORTOOLS_COLOR_UNSELECTED"] = "Nicht ausgewählt",
+    ["SI_HUDITORTOOLS_COLOR_HIDDEN"] = "Versteckt",
 }
 
 for key, value in pairs(strings) do

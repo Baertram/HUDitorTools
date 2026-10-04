@@ -19,6 +19,7 @@ HT.addonWebsite = addonWebsite
 HT.addonFeedback = addonWebsite .. "#comments"
 HT.addonDonation = addonWebsite
 
+local string_format = string.format
 
 local GRID_DEFAULT_COLOR =
 {
@@ -666,14 +667,14 @@ end
 
 local function getHUDEditorInfoBoxSettingsContextMenu()
     clearCustomScrollableMenu()
-    addCustomScrollableMenuHeader("HUD Editor")
-    addCustomScrollableMenuCheckbox("Show all element names",
+    addCustomScrollableMenuHeader(GetString(SI_HUDITORTOOLS_HUD_EDITOR_LAM_HEADER))
+    addCustomScrollableMenuCheckbox(GetString(SI_HUDITORTOOLS_CNTXT_SHOW_ALL_ELEMENTS),
                                     function (comboBox, itemName, item, checked, data)
                                         HT.SV.HUDEditorAlwaysShowAllNames = checked
                                         HE_KB:RebuildAllElements()
                                         rebuildOfHUDEditorNeeded = false
                                     end,
-                                    function () return HT.SV.HUDEditorAlwaysShowAllNames end, { tooltip = "Always show the element names, not only if you mouse-over or select them.\nThis setting will depend on the \'Hide element <= length\' slider value." }
+                                    function () return HT.SV.HUDEditorAlwaysShowAllNames end, { tooltip = GetString(SI_HUDITORTOOLS_CNTXT_SHOW_ALL_ELEMENTS_TT) }
     )
     local sliderDataHideNamesShortherThan =
     {
@@ -708,35 +709,37 @@ local function getHUDEditorInfoBoxSettingsContextMenu()
             return not ZO_HUDEditor_Keyboard_TLInfoBox:IsHidden() and openingControl == infoBoxSettingsButton
         end,
     }
-    addCustomScrollableMenuSlider("Hide element <= length",
+    addCustomScrollableMenuSlider(GetString(SI_HUDITORTOOLS_CNTXT_HIDE_ELEMENTS_LESS_LENGTH),
                                   function (comboBox, slider, value)
                                       HT.SV.HUDEditorHideNamesShorterThan = value
                                       rebuildOfHUDEditorNeeded = true
-                                  end, sliderDataHideNamesShortherThan, { tooltip = "\nHide the elements which name is shorter than the chosen slider value." }
+                                  end, sliderDataHideNamesShortherThan, { tooltip = GetString(SI_HUDITORTOOLS_CNTXT_HIDE_ELEMENTS_LESS_LENGTH_TT) }
     )
     if isAnyHUDEditorElementHidden() then
-        addCustomScrollableMenuHeader("HUD Editor - Hidden Elements (#" .. tostring(getNumHUDEditorElementsHidden()) .. ")")
-        addCustomScrollableMenuEntry("Show all hidden elements again", function (comboBox, itemName, item, selectionChanged, oldItem)
+        addCustomScrollableMenuHeader(string_format(GetString(SI_HUDITORTOOLS_CNTXT_HIDDEN_ELEMENTS_COUNT), tostring(getNumHUDEditorElementsHidden())))
+        addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_CNTXT_SHOW_ALL_HIDDEN_ELEMENTS), function (comboBox, itemName, item, selectionChanged, oldItem)
                                          showAllHiddenHUDEditorElementsAgain(comboBox, nil)
                                      end, LSM_ENTRY_TYPE_NORMAL)
     end
-    addCustomScrollableMenuHeader("Grid")
-    addCustomScrollableMenuCheckbox("Show grid overlay",
+
+    --Grid
+    addCustomScrollableMenuHeader(GetString(SI_HUDITORTOOLS_GRID_LAM_HEADER))
+    addCustomScrollableMenuCheckbox(GetString(SI_HUDITORTOOLS_HUD_EDITOR_GRID_LAM),
                                     function (comboBox, itemName, item, checked, data)
                                         HT.SV.showGrid = checked
                                         refreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_BOTH, comboBox)
                                         HT.RefreshGridOverlay()
                                     end,
-                                    function () return HT.SV.showGrid end, { tooltip = "Enable a grid below the HUD editor elements, where you can visually align the elements to (or use the snap-to-grid feature below)." }
+                                    function () return HT.SV.showGrid end, { tooltip = GetString(SI_HUDITORTOOLS_HUD_EDITOR_GRID_LAM_TT) }
     )
-    addCustomScrollableMenuCheckbox("Enable snap-to-grid",
+    addCustomScrollableMenuCheckbox(GetString(SI_HUDITORTOOLS_HUD_EDITOR_GRID_SNAP_LAM),
                                     function (comboBox, itemName, item, checked, data)
                                         refreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_BOTH, comboBox)
                                         HT.SV.gridSnap = checked
                                     end,
                                     function () return HT.SV.gridSnap end,
                                     {
-                                        tooltip = "Enable the snap-to-grid feature at the grid overlay: Elements moved will be automatically aligned to the grid.",
+                                        tooltip = GetString(SI_HUDITORTOOLS_HUD_EDITOR_GRID_SNAP_LAM_TT),
                                         enabled = function () return HT.SV.showGrid end
                                     }
     )
@@ -754,60 +757,65 @@ local function getHUDEditorInfoBoxSettingsContextMenu()
         width = "60%",                                 -- optional string/number or function returning a string/number The width of the slider
         -- contextMenuCallback = function(comboBox, p_sliderCtrl, data) end,	-- optional function to open a contextMenu at the slider (if right clicked)
     }
-    addCustomScrollableMenuSlider("Grid size",
+    addCustomScrollableMenuSlider(GetString(SI_HUDITORTOOLS_HUD_EDITOR_GRID_SIZE_LAM),
                                   function (comboBox, slider, value)
                                       HT.SV.gridSize = value
                                       HT.RefreshGridOverlayDebounced()
                                   end, sliderDataGridSize,
                                   {
-                                      tooltip = "\nThe grid\'s size",
+                                      tooltip = GetString(SI_HUDITORTOOLS_HUD_EDITOR_GRID_SIZE_LAM_TT),
                                       enabled = function () return HT.SV.showGrid end
                                   }
     )
-    addCustomScrollableMenuCheckbox("Show color picker",
-                                    function (comboBox, itemName, item, checked, data)
-                                        HT.SetColorPickerVisible(checked)
-                                        refreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_BOTH, comboBox)
-                                    end,
-                                    function () return HT.SV.showColorPicker end,
-                                    { tooltip = "Show a live color picker in the HUD editor for grid and element colors." }
+
+    --Colors
+    addCustomScrollableMenuHeader(GetString(SI_HUDITORTOOLS_CNTXT_COLORS))
+    addCustomScrollableMenuCheckbox(GetString(SI_HUDITORTOOLS_CNTXT_SHOW_COLOR_PICKER),
+            function (comboBox, itemName, item, checked, data)
+                HT.SetColorPickerVisible(checked)
+                refreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_BOTH, comboBox)
+            end,
+            function () return HT.SV.showColorPicker end,
+            { tooltip = GetString(SI_HUDITORTOOLS_CNTXT_SHOW_COLOR_PICKER_TT) }
     )
     local colorSlotSubmenu =
     {
         {
-            name = "Grid",
+            name = GetString(SI_HUDITORTOOLS_COLOR_GRID),
             callback = function ()
                 HT.ShowColorPickerForSlot(HT.COLOR_SLOT_GRID)
             end,
             entryType = LSM_ENTRY_TYPE_NORMAL,
         },
         {
-            name = "Selected",
+            name = GetString(SI_HUDITORTOOLS_COLOR_SELECTED),
             callback = function ()
                 HT.ShowColorPickerForSlot(HT.COLOR_SLOT_SELECTED)
             end,
             entryType = LSM_ENTRY_TYPE_NORMAL,
         },
         {
-            name = "Unselected",
+            name = GetString(SI_HUDITORTOOLS_COLOR_UNSELECTED),
             callback = function ()
                 HT.ShowColorPickerForSlot(HT.COLOR_SLOT_UNSELECTED)
             end,
             entryType = LSM_ENTRY_TYPE_NORMAL,
         },
         {
-            name = "Hidden",
+            name = GetString(SI_HUDITORTOOLS_COLOR_HIDDEN),
             callback = function ()
                 HT.ShowColorPickerForSlot(HT.COLOR_SLOT_HIDDEN)
             end,
             entryType = LSM_ENTRY_TYPE_NORMAL,
         },
     }
-    addCustomScrollableSubMenuEntry("Colors", colorSlotSubmenu)
+    addCustomScrollableSubMenuEntry(GetString(SI_HUDITORTOOLS_CNTXT_COLORS), colorSlotSubmenu)
+
+    --Layouts
     addCustomScrollableMenuHeader(GetString(SI_HUDITORTOOLS_LAYOUTS))
     addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_SAVE), function()
                                      HT.SaveActiveLayout()
-                                 end, LSM_ENTRY_TYPE_NORMAL, {
+                                 end, LSM_ENTRY_TYPE_NORMAL, nil, {
                                      tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_SAVE_TOOLTIP),
                                      enabled = function()
                                          return HT.IsLiveLayoutDirty()
@@ -815,17 +823,17 @@ local function getHUDEditorInfoBoxSettingsContextMenu()
                                  })
     addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_NEW), function()
                                      HT.ShowLayoutNameDialog("new")
-                                 end, LSM_ENTRY_TYPE_NORMAL, {
+                                 end, LSM_ENTRY_TYPE_NORMAL, nil, {
                                      tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_NEW_TOOLTIP),
                                  })
     addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_IMPORT), function()
                                      HT.ShowLayoutImportDialog()
-                                 end, LSM_ENTRY_TYPE_NORMAL, {
+                                 end, LSM_ENTRY_TYPE_NORMAL, nil, {
                                      tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_IMPORT_TOOLTIP),
                                  })
     addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_EXPORT), function()
                                      HT.ShowLayoutExportDialog()
-                                 end, LSM_ENTRY_TYPE_NORMAL, {
+                                 end, LSM_ENTRY_TYPE_NORMAL, nil, {
                                      tooltip = GetString(SI_HUDITORTOOLS_LAYOUT_EXPORT_TOOLTIP),
                                  })
     addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_RENAME), function()
@@ -833,12 +841,14 @@ local function getHUDEditorInfoBoxSettingsContextMenu()
                                  end, LSM_ENTRY_TYPE_NORMAL)
     addCustomScrollableMenuEntry(GetString(SI_HUDITORTOOLS_LAYOUT_DELETE), function()
                                      HT.ShowLayoutDeleteConfirmation()
-                                 end, LSM_ENTRY_TYPE_NORMAL, {
+                                 end, LSM_ENTRY_TYPE_NORMAL, nil, {
                                      enabled = function()
                                          return HT.CountAllLayoutsForCharacter() > 1
                                      end,
                                  })
-    showCustomScrollableMenu(nil, { minDropdownWidth = 325 }, specialCallbackData)
+    -----------------------------------------------------------------------------------------
+    --Show the LSM menu now
+    showCustomScrollableMenu(nil, { minDropdownWidth = 325, visibleRowsDropdown = 25 }, specialCallbackData)
 end
 
 local buttonDataHUDEditInfoBoxSettings =

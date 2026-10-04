@@ -124,6 +124,20 @@ local strings = {
     ["SI_HUDITORTOOLS_HUD_EDITOR_GRID_SIZE_LAM_TT"] = "The grid\'s size",
     ["SI_HUDITORTOOLS_HUD_EDITOR_GRID_LINE_COLOR_LAM"] = "Grid line color",
     ["SI_HUDITORTOOLS_HUD_EDITOR_GRID_LINE_COLOR_LAM_TT"] = "Change the grid line color and alpha level",
+    --Context menu
+    ["SI_HUDITORTOOLS_CNTXT_SHOW_ALL_ELEMENTS"] = "Show all element names",
+    ["SI_HUDITORTOOLS_CNTXT_SHOW_ALL_ELEMENTS_TT"] = "Always show the element names, not only if you mouse-over or select them.\nThis setting will depend on the \'Hide element <= length\' slider value.",
+    ["SI_HUDITORTOOLS_CNTXT_HIDE_ELEMENTS_LESS_LENGTH"] = "Hide element <= length",
+    ["SI_HUDITORTOOLS_CNTXT_HIDE_ELEMENTS_LESS_LENGTH_TT"] = "\nHide the elements which name is shorter than the chosen slider value.",
+    ["SI_HUDITORTOOLS_CNTXT_HIDDEN_ELEMENTS_COUNT"] = "HUD Editor - Hidden Elements (#%s)",
+    ["SI_HUDITORTOOLS_CNTXT_SHOW_ALL_HIDDEN_ELEMENTS"] = "Show all hidden elements again",
+    ["SI_HUDITORTOOLS_CNTXT_SHOW_COLOR_PICKER"] = "Show color picker",
+    ["SI_HUDITORTOOLS_CNTXT_SHOW_COLOR_PICKER_TT"] = "Show a live color picker in the HUD editor for grid and element colors.",
+    ["SI_HUDITORTOOLS_CNTXT_COLORS"] = "Colors",
+    ["SI_HUDITORTOOLS_COLOR_GRID"] = "Grid",
+    ["SI_HUDITORTOOLS_COLOR_SELECTED"] = "Selected",
+    ["SI_HUDITORTOOLS_COLOR_UNSELECTED"] = "Unselected",
+    ["SI_HUDITORTOOLS_COLOR_HIDDEN"] = "Hidden",
 }
 
 for stringId, value in pairs(strings) do
