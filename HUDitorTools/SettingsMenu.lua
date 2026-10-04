@@ -22,7 +22,7 @@ function HT.RefreshLamLayoutDropdown()
     end
 
     local dropdownControl = _G[LAM_ACTIVE_LAYOUT_DROPDOWN_REFERENCE]
-    if not dropdownControl or not dropdownControl.UpdateChoices then
+    if not dropdownControl then
         return
     end
     dropdownControl:UpdateChoices(lamLayoutChoices, lamLayoutChoiceValues)
@@ -51,7 +51,7 @@ function HT.buildSettingsMenu()
     local lamSettingsPanelName = HT.eventName .. "_LAM"
     HT.LAMSettingsPanel = LAM:RegisterAddonPanel(lamSettingsPanelName, panelData)
 
-    CALLBACK_MANAGER:RegisterCallback("LAM-PanelOpened", function(panel)
+    CALLBACK_MANAGER:RegisterCallback("LAM-PanelOpened", function (panel)
         if panel == HT.LAMSettingsPanel then
             HT.RefreshLamLayoutDropdown()
         end

@@ -104,6 +104,9 @@ local strings = {
     ["SI_HUDITORTOOLS_FRAME_LUIE_CAST_BAR"] = "LuiExtended полоса произнесения",
     ["SI_HUDITORTOOLS_FRAME_LUIE_CROWD_CONTROL"] = "LuiExtended контроль",
     ["SI_HUDITORTOOLS_FRAME_LUIE_MINIMAP"] = "LuiExtended миникарта",
+
+    ["SI_HUDITORTOOLS_APPEARANCE_LABEL_OFFSET_Y"] = "Смещение текста Y",
+    ["SI_HUDITORTOOLS_APPEARANCE_RESET"] = "Сбросить масштаб, шрифт и смещение",
 }
 
 for key, value in pairs(strings) do

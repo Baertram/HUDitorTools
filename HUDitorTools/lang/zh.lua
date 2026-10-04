@@ -104,6 +104,9 @@ local strings = {
     ["SI_HUDITORTOOLS_FRAME_LUIE_CAST_BAR"] = "LuiExtended 施法条",
     ["SI_HUDITORTOOLS_FRAME_LUIE_CROWD_CONTROL"] = "LuiExtended 控制",
     ["SI_HUDITORTOOLS_FRAME_LUIE_MINIMAP"] = "LuiExtended 小地图",
+
+    ["SI_HUDITORTOOLS_APPEARANCE_LABEL_OFFSET_Y"] = "文字垂直偏移",
+    ["SI_HUDITORTOOLS_APPEARANCE_RESET"] = "重置缩放、字体和偏移",
 }
 
 for key, value in pairs(strings) do

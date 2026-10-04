@@ -104,6 +104,10 @@ local strings = {
     ["SI_HUDITORTOOLS_FRAME_LUIE_CAST_BAR"] = "LuiExtended barre d'incantation",
     ["SI_HUDITORTOOLS_FRAME_LUIE_CROWD_CONTROL"] = "LuiExtended contrôle",
     ["SI_HUDITORTOOLS_FRAME_LUIE_MINIMAP"] = "LuiExtended minicarte",
+
+    ["SI_HUDITORTOOLS_APPEARANCE_LABEL_OFFSET_Y"] = "Décalage du texte Y",
+    ["SI_HUDITORTOOLS_APPEARANCE_RESET"] = "Réinitialiser l'échelle, la police et le décalage",
+
 }
 
 for key, value in pairs(strings) do

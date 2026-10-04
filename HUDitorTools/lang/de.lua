@@ -104,6 +104,8 @@ local strings = {
     ["SI_HUDITORTOOLS_FRAME_LUIE_CAST_BAR"] = "LuiExtended Zauberleiste",
     ["SI_HUDITORTOOLS_FRAME_LUIE_CROWD_CONTROL"] = "LuiExtended Kontrolleffekte",
     ["SI_HUDITORTOOLS_FRAME_LUIE_MINIMAP"] = "LuiExtended Minikarte",
+    ["SI_HUDITORTOOLS_APPEARANCE_LABEL_OFFSET_Y"] = "Textversatz Y",
+    ["SI_HUDITORTOOLS_APPEARANCE_RESET"] = "Skalierung, Schrift und Versatz zurücksetzen",
 
     --New Baertram 261004
     --LAM
@@ -138,6 +140,11 @@ local strings = {
     ["SI_HUDITORTOOLS_COLOR_SELECTED"] = "Ausgewählt",
     ["SI_HUDITORTOOLS_COLOR_UNSELECTED"] = "Nicht ausgewählt",
     ["SI_HUDITORTOOLS_COLOR_HIDDEN"] = "Versteckt",
+    ["SI_HUDITORTOOLS_CNTXT_HIDDEN_ELEMENTS"] = "Versteckte Elemente",
+    ["SI_HUDITORTOOLS_CNTXT_ELEMENT_UNHIDE"] = "Selektierte wieder anzeigen",
+    ["SI_HUDITORTOOLS_CNTXT_HIDE_AT_HUDEDITOR"] = "Im HUD Editor verstecken",
+    ["SI_HUDITORTOOLS_CNTXT_UNHIDE_AT_HUDEDITOR"] = "Im HUD Editor anzeigen",
+    ["SI_HUDITORTOOLS_CNTXT_SHOW_ALL_HIDDEN"] = "|c00F000Zeige alle|r versteckte Elemente wieder an",
 }
 
 for key, value in pairs(strings) do
