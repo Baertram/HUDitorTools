@@ -43,8 +43,7 @@ function HT.CopyResourceBarGroup(sourceGroup)
         healthWidth = ClampHealthWidth(sourceGroup.healthWidth)
         preventExpand = sourceGroup.preventExpand == true
     end
-    return
-    {
+    return {
         enabled = enabled,
         healthWidth = healthWidth,
         preventExpand = preventExpand,
@@ -102,9 +101,14 @@ function HT.IsPlayerResourceBarSaveKey(saveKey)
 end
 
 local function GetShrinkExpandModule()
-    -- ZO_UnitAttributeVisualizer.visualModules is set in UnitAttributeVisualizer:New.
-    -- PLAYER_ATTRIBUTE_BARS.attributeVisualizer is set in ZO_PlayerAttributeBars:New.
-    local visualModules = PLAYER_ATTRIBUTE_BARS.attributeVisualizer.visualModules
+    local attributeBars = PLAYER_ATTRIBUTE_BARS
+    if not attributeBars or not attributeBars.attributeVisualizer then
+        return nil
+    end
+    local visualModules = attributeBars.attributeVisualizer.visualModules
+    if not visualModules then
+        return nil
+    end
     for visualModule in pairs(visualModules) do
         if visualModule.normalWidth and visualModule.expandedWidth and visualModule.barControls then
             return visualModule
@@ -114,12 +118,19 @@ local function GetShrinkExpandModule()
 end
 
 local function SetBarWidth(bar, width)
-    -- bgContainer is assigned in ZO_PlayerAttributeContainer OnInitialized.
+    if not bar or not width then
+        return
+    end
     bar:SetWidth(width)
-    bar.bgContainer:SetWidth(width)
+    if bar.bgContainer and bar.bgContainer.SetWidth then
+        bar.bgContainer:SetWidth(width)
+    end
 end
 
 local function GetPlayerAttributeFrameElement()
+    if not ZO_PlayerAttribute or not HUD_MANAGER then
+        return nil
+    end
     if IsInGamepadPreferredMode() then
         return HUD_MANAGER:GetGamepadElementForControl(ZO_PlayerAttribute)
     end
@@ -127,11 +138,18 @@ local function GetPlayerAttributeFrameElement()
 end
 
 local function IsPlayerAttributeFrameCombined()
-    return GetPlayerAttributeFrameElement():GetCustomOptionValue("Combine") == true
+    local frameElement = GetPlayerAttributeFrameElement()
+    if not frameElement or not frameElement.GetCustomOptionValue then
+        return false
+    end
+    return frameElement:GetCustomOptionValue("Combine") == true
 end
 
 local function SetResourceBarsCombined()
     local frameElement = GetPlayerAttributeFrameElement()
+    if not frameElement or not frameElement.GetCustomOptionValue then
+        return
+    end
     if frameElement:GetCustomOptionValue("Combine") then
         return
     end
@@ -143,6 +161,9 @@ local function ApplyStackedResourceBarLayout()
     local health = ZO_PlayerAttributeHealth
     local magicka = ZO_PlayerAttributeMagicka
     local stamina = ZO_PlayerAttributeStamina
+    if not parent or not health or not magicka or not stamina then
+        return
+    end
 
     health:ClearAnchors()
     health:SetAnchor(CENTER, parent, CENTER, 0, 0)
@@ -154,8 +175,11 @@ local function ApplyStackedResourceBarLayout()
     stamina:ClearAnchors()
     stamina:SetAnchor(TOPLEFT, health, BOTTOM, 1, 2)
 
-    ZO_PlayerAttributeSiegeHealth:ClearAnchors()
-    ZO_PlayerAttributeSiegeHealth:SetAnchor(CENTER, health, CENTER, 300, 0)
+    local siege = ZO_PlayerAttributeSiegeHealth
+    if siege then
+        siege:ClearAnchors()
+        siege:SetAnchor(CENTER, health, CENTER, 300, 0)
+    end
 end
 
 local function RestoreStockResourceBarLayout()
@@ -163,6 +187,9 @@ local function RestoreStockResourceBarLayout()
     local health = ZO_PlayerAttributeHealth
     local magicka = ZO_PlayerAttributeMagicka
     local stamina = ZO_PlayerAttributeStamina
+    if not parent or not health or not magicka or not stamina then
+        return
+    end
 
     magicka:ClearAnchors()
     magicka:SetAnchor(RIGHT, parent, LEFT, STOCK_BAR_WIDTH, 0)
@@ -171,14 +198,21 @@ local function RestoreStockResourceBarLayout()
     stamina:ClearAnchors()
     stamina:SetAnchor(LEFT, parent, RIGHT, -STOCK_BAR_WIDTH, 0)
 
-    ZO_PlayerAttributeSiegeHealth:ClearAnchors()
-    ZO_PlayerAttributeSiegeHealth:SetAnchor(TOP, health, BOTTOM, 0, -1)
-    ZO_PlayerAttributeSiegeHealth:SetWidth(STOCK_SMALL_BAR_WIDTH)
-    ZO_PlayerAttributeWerewolf:SetWidth(STOCK_SMALL_BAR_WIDTH)
-    ZO_PlayerAttributeMountStamina:SetWidth(STOCK_SMALL_BAR_WIDTH)
+    local siege = ZO_PlayerAttributeSiegeHealth
+    if siege then
+        siege:ClearAnchors()
+        siege:SetAnchor(TOP, health, BOTTOM, 0, -1)
+        siege:SetWidth(STOCK_SMALL_BAR_WIDTH)
+    end
+    if ZO_PlayerAttributeWerewolf then
+        ZO_PlayerAttributeWerewolf:SetWidth(STOCK_SMALL_BAR_WIDTH)
+    end
+    if ZO_PlayerAttributeMountStamina then
+        ZO_PlayerAttributeMountStamina:SetWidth(STOCK_SMALL_BAR_WIDTH)
+    end
 
     local shrinkModule = GetShrinkExpandModule()
-    if shrinkModule and shrinkModule.barInfo then
+    if shrinkModule and shrinkModule.barInfo and shrinkModule.barControls then
         for stat, info in pairs(shrinkModule.barInfo) do
             local bar = shrinkModule.barControls[stat]
             local width = STOCK_BAR_WIDTH
@@ -195,12 +229,14 @@ local function RestoreStockResourceBarLayout()
         SetBarWidth(stamina, STOCK_BAR_WIDTH)
     end
 
-    PLAYER_ATTRIBUTE_BARS:ResizeToFitScreen()
+    if PLAYER_ATTRIBUTE_BARS and PLAYER_ATTRIBUTE_BARS.ResizeToFitScreen then
+        PLAYER_ATTRIBUTE_BARS:ResizeToFitScreen()
+    end
 end
 
 local function ApplyPreventResourceBarExpand()
     local shrinkModule = GetShrinkExpandModule()
-    if not shrinkModule or not shrinkModule.barInfo then
+    if not shrinkModule or not shrinkModule.barControls or not shrinkModule.barInfo or not shrinkModule.OnValueChanged then
         return
     end
     local targetExpandedWidth = STOCK_EXPANDED_WIDTH
@@ -210,7 +246,7 @@ local function ApplyPreventResourceBarExpand()
     shrinkModule.expandedWidth = targetExpandedWidth
     for stat, bar in pairs(shrinkModule.barControls) do
         local info = shrinkModule.barInfo[stat]
-        if info and info.state == ATTRIBUTE_BAR_STATE_EXPANDED and zo_abs(bar:GetWidth() - targetExpandedWidth) > 0.5 then
+        if bar and info and info.animation and info.state == ATTRIBUTE_BAR_STATE_EXPANDED and bar.GetWidth and zo_abs(bar:GetWidth() - targetExpandedWidth) > 0.5 then
             info.state = ATTRIBUTE_BAR_STATE_NORMAL
             shrinkModule:OnValueChanged(bar, info, stat, true)
         end
@@ -239,7 +275,9 @@ function HT.SetResourceBarPreventExpand(preventExpand)
     local settings = GetResourceBarGroupSettings()
     settings.preventExpand = preventExpand == true
     ApplyPreventResourceBarExpand()
-    HT.RefreshLayoutInfoBoxSection()
+    if HT.RefreshLayoutInfoBoxSection then
+        HT.RefreshLayoutInfoBoxSection()
+    end
 end
 
 function HT.SetResourceBarGroupEnabled(enabled)
@@ -249,10 +287,12 @@ function HT.SetResourceBarGroupEnabled(enabled)
         SetResourceBarsCombined()
     end
     HT.ApplyResourceBarGroup()
-    if HUD_EDITOR_KEYBOARD:IsShowing() then
+    if HUD_EDITOR_KEYBOARD and HUD_EDITOR_KEYBOARD:IsShowing() then
         HUD_EDITOR_KEYBOARD:RebuildAllElements()
     end
-    HT.RefreshLayoutInfoBoxSection()
+    if HT.RefreshLayoutInfoBoxSection then
+        HT.RefreshLayoutInfoBoxSection()
+    end
 end
 
 function HT.SetResourceBarGroupHealthWidth(healthWidth)
@@ -260,11 +300,13 @@ function HT.SetResourceBarGroupHealthWidth(healthWidth)
     settings.healthWidth = ClampHealthWidth(healthWidth)
     if settings.enabled then
         HT.ApplyResourceBarGroup()
-        if HUD_EDITOR_KEYBOARD:IsShowing() then
+        if HUD_EDITOR_KEYBOARD and HUD_EDITOR_KEYBOARD:IsShowing() then
             HUD_EDITOR_KEYBOARD:RebuildAllElements()
         end
     end
-    HT.RefreshLayoutInfoBoxSection()
+    if HT.RefreshLayoutInfoBoxSection then
+        HT.RefreshLayoutInfoBoxSection()
+    end
     return settings.healthWidth
 end
 
@@ -272,6 +314,9 @@ end
 -- self:methodName() call inside it cannot re-enter this wrapper.
 local function CreateGroupedLayoutMethodHook(attributeBars, methodName)
     local originalMethod = attributeBars[methodName]
+    if type(originalMethod) ~= "function" then
+        return
+    end
     local groupedLayoutMethod
     groupedLayoutMethod = function (self, ...)
         self[methodName] = originalMethod
@@ -281,7 +326,7 @@ local function CreateGroupedLayoutMethodHook(attributeBars, methodName)
             ApplyStackedResourceBarLayout()
             groupedLayoutIsApplied = true
         end
-        if methodName == "ApplyStyle" then
+        if methodName == "ApplyStyle" and HT.ApplyAllElementAppearances then
             HT.ApplyAllElementAppearances()
         end
     end
@@ -292,8 +337,10 @@ function HT.InitializeResourceBarGroup()
     GetResourceBarGroupSettings()
     if not resourceBarHooksInstalled then
         resourceBarHooksInstalled = true
-        CreateGroupedLayoutMethodHook(PLAYER_ATTRIBUTE_BARS, "ApplyStyle")
-        CreateGroupedLayoutMethodHook(PLAYER_ATTRIBUTE_BARS, "OnScreenResized")
+        if PLAYER_ATTRIBUTE_BARS then
+            CreateGroupedLayoutMethodHook(PLAYER_ATTRIBUTE_BARS, "ApplyStyle")
+            CreateGroupedLayoutMethodHook(PLAYER_ATTRIBUTE_BARS, "OnScreenResized")
+        end
     end
     HT.ApplyResourceBarGroup()
 end

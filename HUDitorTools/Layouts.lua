@@ -25,13 +25,12 @@ end
 
 function HT.CollectLiveHudPayload()
     local profile = GetLiveHudProfile()
-    return HT.NormalizeLayoutPayload(
-        {
-            keyboardElements = profile.keyboardElements,
-            gamepadElements = profile.gamepadElements,
-            elementAppearance = HT.SV.elementAppearance,
-            resourceBarGroup = HT.SV.resourceBarGroup,
-        })
+    return HT.NormalizeLayoutPayload({
+        keyboardElements = profile.keyboardElements,
+        gamepadElements = profile.gamepadElements,
+        elementAppearance = HT.SV.elementAppearance,
+        resourceBarGroup = HT.SV.resourceBarGroup,
+    })
 end
 
 local function SetLiveLayoutBaseline(payload)
@@ -262,13 +261,13 @@ function HT.ApplyHudLayoutPayload(payload, layoutName)
             GetString(SI_HUDITORTOOLS_LAYOUT_APPLY_RESULT),
             layoutName,
             NonContiguousCount(payloadToApply.keyboardElements),
-            CountRegisteredMatches(function ()
-                                       return HUD_MANAGER:KeyboardElementIterator()
-                                   end, payloadToApply.keyboardElements),
+            CountRegisteredMatches(function()
+                return HUD_MANAGER:KeyboardElementIterator()
+            end, payloadToApply.keyboardElements),
             NonContiguousCount(payloadToApply.gamepadElements),
-            CountRegisteredMatches(function ()
-                                       return HUD_MANAGER:GamepadElementIterator()
-                                   end, payloadToApply.gamepadElements)
+            CountRegisteredMatches(function()
+                return HUD_MANAGER:GamepadElementIterator()
+            end, payloadToApply.gamepadElements)
         ))
     end
     return true
@@ -372,6 +371,7 @@ function HT.DeleteHudLayout(scope, layoutId)
     else
         HT.RefreshLayoutInfoBoxSection()
     end
+    HT.UpdateLAMDeleteLayoutButtonDisabledState()
     return true
 end
 
@@ -382,14 +382,12 @@ function HT.SwitchHudLayout(scope, layoutId)
         return true
     end
     if HT.IsLiveLayoutDirty() then
-        ZO_Dialogs_ShowDialog("HUDITORTOOLS_LAYOUT_UNSAVED_CONFIRMATION",
-                              {
-                                  scope = scope,
-                                  layoutId = layoutId,
-                              },
-                              {
-                                  mainTextParams = { layoutData.name },
-                              })
+        ZO_Dialogs_ShowDialog("HUDITORTOOLS_LAYOUT_UNSAVED_CONFIRMATION", {
+            scope = scope,
+            layoutId = layoutId,
+        }, {
+            mainTextParams = { layoutData.name },
+        })
         HT.RefreshLayoutInfoBoxSection()
         return false
     end
@@ -447,7 +445,7 @@ function HT.InitializeHudLayouts()
         HUD_MANAGER:RegisterCallback("SavedVarsReady", OnHudSavedVarsReady)
     end
 
-    HUD_MANAGER:RegisterCallback("OffsetsChanged", function ()
+    HUD_MANAGER:RegisterCallback("OffsetsChanged", function()
         if suppressOffsetsChangedRefresh then
             return
         end

@@ -135,9 +135,11 @@ local outlineComboBox
 local suppressAppearanceComboCallback = false
 
 local function GetSelectedElementData()
-    -- ZO_HUDEditor_Keyboard:GetSelectedElement / ZO_HUDEditorElement_Keyboard:GetElementData
+    if not HE_KB or not HE_KB.GetSelectedElement then
+        return nil
+    end
     local selectedElement = HE_KB:GetSelectedElement()
-    if not selectedElement then
+    if not selectedElement or not selectedElement.GetElementData then
         return nil
     end
     return selectedElement:GetElementData()
@@ -149,10 +151,6 @@ end
 
 local function GetFontSizeEdit()
     return appearanceSection:GetNamedChild("FontSizeRow"):GetNamedChild("Backdrop"):GetNamedChild("Edit")
-end
-
-local function GetLabelOffsetEdit()
-    return appearanceSection:GetNamedChild("LabelOffsetRow"):GetNamedChild("Backdrop"):GetNamedChild("Edit")
 end
 
 local function GetResourceWidthEdit()
@@ -189,13 +187,11 @@ end
 
 local function CurrentAppearanceRow(elementData)
     local row = HT.GetAppearanceRow(elementData:GetSaveKey()) or {}
-    return
-    {
+    return {
         scale = tonumber(row.scale) or 1,
         fontFace = row.fontFace or "",
         fontSize = tonumber(row.fontSize) or HT.APPEARANCE_FONT_SIZE_DEFAULT,
         fontOutline = row.fontOutline or HT.GetDefaultFontOutline(),
-        labelOffsetY = HT.ClampAppearanceLabelOffsetY(row.labelOffsetY),
     }
 end
 
@@ -203,10 +199,12 @@ local function CommitAppearanceRow(elementData, row)
     HT.SetAppearanceRow(elementData:GetSaveKey(), row)
     HT.ApplyElementAppearance(elementData)
     local selectedElement = HE_KB:GetSelectedElement()
-    if selectedElement then
+    if selectedElement and selectedElement.RefreshAnchors then
         selectedElement:RefreshAnchors()
     end
-    HT.RefreshLayoutInfoBoxSection()
+    if HT.RefreshLayoutInfoBoxSection then
+        HT.RefreshLayoutInfoBoxSection()
+    end
 end
 
 local function ApplyScaleFromEdit(elementData)
@@ -228,14 +226,6 @@ local function ApplyFontSizeFromEdit(elementData)
     GetFontSizeEdit():SetText(tostring(fontSize))
     local row = CurrentAppearanceRow(elementData)
     row.fontSize = fontSize
-    CommitAppearanceRow(elementData, row)
-end
-
-local function ApplyLabelOffsetFromEdit(elementData)
-    local labelOffsetY = HT.ClampAppearanceLabelOffsetY(GetLabelOffsetEdit():GetText())
-    GetLabelOffsetEdit():SetText(tostring(labelOffsetY))
-    local row = CurrentAppearanceRow(elementData)
-    row.labelOffsetY = labelOffsetY
     CommitAppearanceRow(elementData, row)
 end
 
@@ -312,7 +302,6 @@ function HT.RefreshAppearanceInfoBox()
     local row = CurrentAppearanceRow(elementData)
     GetScaleEdit():SetText(tostring(zo_round(row.scale * 100)))
     GetFontSizeEdit():SetText(tostring(row.fontSize))
-    GetLabelOffsetEdit():SetText(tostring(row.labelOffsetY))
     UpdateOptionalAppearanceRows(row.fontFace)
 
     local fontValues, fontLabels = HT.GetFontFaceChoices()
@@ -402,17 +391,6 @@ local function CreateAppearanceSection()
         fontSizeEdit:LoseFocus()
     end)
 
-    local labelOffsetEdit = GetLabelOffsetEdit()
-    labelOffsetEdit:SetHandler("OnFocusLost", function ()
-        local elementData = GetSelectedElementData()
-        if elementData then
-            ApplyLabelOffsetFromEdit(elementData)
-        end
-    end)
-    labelOffsetEdit:SetHandler("OnEnter", function ()
-        labelOffsetEdit:LoseFocus()
-    end)
-
     appearanceSection:GetNamedChild("Reset"):SetHandler("OnClicked", function ()
         local elementData = GetSelectedElementData()
         if not elementData then
@@ -421,11 +399,13 @@ local function CreateAppearanceSection()
         HT.SetAppearanceRow(elementData:GetSaveKey(), nil)
         HT.ApplyElementAppearance(elementData)
         local selectedElement = HE_KB:GetSelectedElement()
-        if selectedElement then
+        if selectedElement and selectedElement.RefreshAnchors then
             selectedElement:RefreshAnchors()
         end
         HT.RefreshAppearanceInfoBox()
-        HT.RefreshLayoutInfoBoxSection()
+        if HT.RefreshLayoutInfoBoxSection then
+            HT.RefreshLayoutInfoBoxSection()
+        end
     end)
 
     local resourceGroup = appearanceSection:GetNamedChild("ResourceGroup")

@@ -16,6 +16,11 @@ local exportDialogControl
 local nameDialogControl
 local nameDialogMode
 
+function HT.UpdateLAMDeleteLayoutButtonDisabledState()
+    if HUDITORTOOLS_LAM_DELETE_LAYOUT_BUTTON == nil or HUDITORTOOLS_LAM_DELETE_LAYOUT_BUTTON:IsHidden() then return end
+    HUDITORTOOLS_LAM_DELETE_LAYOUT_BUTTON:UpdateDisabled()
+end
+
 function HT.HideLayoutDialogs()
     importDialogControl:SetHidden(true)
     exportDialogControl:SetHidden(true)
@@ -45,7 +50,7 @@ local function AddLayoutComboItems(comboBox, scope, layoutList, activeLayout, se
     for _, layoutData in ipairs(layoutList) do
         local isActive = activeLayout and activeLayout.layoutId == layoutData.layoutId and HT.GetLayoutSelection().scope == scope
         local displayName = HT.FormatLayoutChoiceName(scope, layoutData, isActive)
-        local itemEntry = comboBox:CreateItemEntry(displayName, function ()
+        local itemEntry = comboBox:CreateItemEntry(displayName, function()
             if suppressLayoutComboCallback then
                 return
             end
@@ -225,6 +230,7 @@ local function ConfirmNameDialog()
         end
         local SKIP_APPLY = true
         HT.SetActiveLayout(scope, layoutData.layoutId, SKIP_APPLY)
+        HT.UpdateLAMDeleteLayoutButtonDisabledState()
     end
     HT.HideLayoutDialogs()
 end
@@ -275,14 +281,12 @@ end
 
 function HT.ShowLayoutDeleteConfirmation()
     local activeLayout, activeScope = HT.GetActiveLayout()
-    ZO_Dialogs_ShowDialog("HUDITORTOOLS_LAYOUT_DELETE_CONFIRMATION",
-                          {
-                              scope = activeScope,
-                              layoutId = activeLayout.layoutId,
-                          },
-                          {
-                              mainTextParams = { activeLayout.name },
-                          })
+    ZO_Dialogs_ShowDialog("HUDITORTOOLS_LAYOUT_DELETE_CONFIRMATION", {
+        scope = activeScope,
+        layoutId = activeLayout.layoutId,
+    }, {
+        mainTextParams = { activeLayout.name },
+    })
 end
 
 local function InitializeImportDialog()
@@ -351,15 +355,15 @@ local function InitializeInfoBoxSection()
     layoutComboBox:SetSortsItems(false)
     comboControl:SetDrawLevel(INTERACTABLE_LEVEL)
 
-    layoutInfoBoxSection:GetNamedChild("Save"):SetHandler("OnClicked", function ()
+    layoutInfoBoxSection:GetNamedChild("Save"):SetHandler("OnClicked", function()
         HT.SaveActiveLayout()
     end)
-    layoutInfoBoxSection:GetNamedChild("New"):SetHandler("OnClicked", function ()
+    layoutInfoBoxSection:GetNamedChild("New"):SetHandler("OnClicked", function()
         HT.ShowLayoutNameDialog("new")
     end)
     layoutInfoBoxSection:GetNamedChild("Import"):SetHandler("OnClicked", HT.ShowLayoutImportDialog)
     layoutInfoBoxSection:GetNamedChild("Export"):SetHandler("OnClicked", HT.ShowLayoutExportDialog)
-    layoutInfoBoxSection:GetNamedChild("Rename"):SetHandler("OnClicked", function ()
+    layoutInfoBoxSection:GetNamedChild("Rename"):SetHandler("OnClicked", function()
         HT.ShowLayoutNameDialog("rename")
     end)
     layoutInfoBoxSection:GetNamedChild("Delete"):SetHandler("OnClicked", HT.ShowLayoutDeleteConfirmation)
@@ -368,56 +372,56 @@ local function InitializeInfoBoxSection()
 end
 
 ZO_Dialogs_RegisterCustomDialog("HUDITORTOOLS_LAYOUT_DELETE_CONFIRMATION",
-                                {
-                                    title =
-                                    {
-                                        text = SI_HUDITORTOOLS_LAYOUT_DELETE_TITLE,
-                                    },
-                                    mainText =
-                                    {
-                                        text = SI_HUDITORTOOLS_LAYOUT_DELETE_BODY,
-                                    },
-                                    drawTier = DT_HIGH,
-                                    canQueue = true,
-                                    buttons =
-                                    {
-                                        {
-                                            text = SI_DIALOG_CONFIRM,
-                                            callback = function (dialog)
-                                                HT.DeleteHudLayout(dialog.data.scope, dialog.data.layoutId)
-                                            end,
-                                        },
-                                        {
-                                            text = SI_DIALOG_CANCEL,
-                                        },
-                                    },
-                                })
+{
+    title =
+    {
+        text = SI_HUDITORTOOLS_LAYOUT_DELETE_TITLE,
+    },
+    mainText =
+    {
+        text = SI_HUDITORTOOLS_LAYOUT_DELETE_BODY,
+    },
+    drawTier = DT_HIGH,
+    canQueue = true,
+    buttons =
+    {
+        {
+            text = SI_DIALOG_CONFIRM,
+            callback = function(dialog)
+                HT.DeleteHudLayout(dialog.data.scope, dialog.data.layoutId)
+            end,
+        },
+        {
+            text = SI_DIALOG_CANCEL,
+        },
+    },
+})
 
 ZO_Dialogs_RegisterCustomDialog("HUDITORTOOLS_LAYOUT_UNSAVED_CONFIRMATION",
-                                {
-                                    title =
-                                    {
-                                        text = SI_HUDITORTOOLS_LAYOUT_UNSAVED_TITLE,
-                                    },
-                                    mainText =
-                                    {
-                                        text = SI_HUDITORTOOLS_LAYOUT_UNSAVED_BODY,
-                                    },
-                                    drawTier = DT_HIGH,
-                                    canQueue = true,
-                                    buttons =
-                                    {
-                                        {
-                                            text = SI_DIALOG_CONFIRM,
-                                            callback = function (dialog)
-                                                HT.ConfirmSwitchHudLayout(dialog.data.scope, dialog.data.layoutId)
-                                            end,
-                                        },
-                                        {
-                                            text = SI_DIALOG_CANCEL,
-                                        },
-                                    },
-                                })
+{
+    title =
+    {
+        text = SI_HUDITORTOOLS_LAYOUT_UNSAVED_TITLE,
+    },
+    mainText =
+    {
+        text = SI_HUDITORTOOLS_LAYOUT_UNSAVED_BODY,
+    },
+    drawTier = DT_HIGH,
+    canQueue = true,
+    buttons =
+    {
+        {
+            text = SI_DIALOG_CONFIRM,
+            callback = function(dialog)
+                HT.ConfirmSwitchHudLayout(dialog.data.scope, dialog.data.layoutId)
+            end,
+        },
+        {
+            text = SI_DIALOG_CANCEL,
+        },
+    },
+})
 
 function HT.InstallLayoutInfoBoxSection()
     InitializeImportDialog()
@@ -425,7 +429,7 @@ function HT.InstallLayoutInfoBoxSection()
     InitializeNameDialog()
     InitializeInfoBoxSection()
 
-    ZO_PostHook(ZO_HUDEditor_Keyboard, "RefreshInfoBox", function ()
+    ZO_PostHook(ZO_HUDEditor_Keyboard, "RefreshInfoBox", function()
         HT.RefreshLayoutInfoBoxSection()
     end)
 end

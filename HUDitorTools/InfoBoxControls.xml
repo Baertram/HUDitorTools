@@ -123,44 +123,12 @@
             </Backdrop>
           </Controls>
         </Control>
-        <Control name="$(parent)LabelOffsetRow"
-                 resizeToFitDescendents="true">
-          <Anchor point="TOPLEFT"
-                  relativeTo="$(parent)ScaleRow"
-                  relativePoint="BOTTOMLEFT"
-                  offsetY="8" />
-          <Controls>
-            <Label name="$(parent)Name"
-                   font="ZoFontGame"
-                   text="SI_HUDITORTOOLS_APPEARANCE_LABEL_OFFSET_Y"
-                   color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_NORMAL">
-              <Anchor point="TOPLEFT" />
-              <Dimensions x="140" />
-            </Label>
-            <Backdrop name="$(parent)Backdrop"
-                      layer="CONTROLS"
-                      inherits="ZO_SingleLineEditBackdrop_Keyboard">
-              <Anchor point="LEFT"
-                      relativeTo="$(parent)Name"
-                      relativePoint="RIGHT"
-                      offsetX="10" />
-              <Dimensions x="50"
-                          y="18" />
-              <Controls>
-                <EditBox name="$(parent)Edit"
-                         inherits="ZO_DefaultEditForBackdrop"
-                         maxInputCharacters="4"
-                         level="ZO_HUD_EDITOR_KEYBOARD_INFO_BOX_INTERACTABLE_ELEMENT_LEVEL" />
-              </Controls>
-            </Backdrop>
-          </Controls>
-        </Control>
         <Label name="$(parent)FontLabel"
                font="ZoFontGame"
                text="SI_HUDITORTOOLS_APPEARANCE_FONT"
                color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_NORMAL">
           <Anchor point="TOPLEFT"
-                  relativeTo="$(parent)LabelOffsetRow"
+                  relativeTo="$(parent)ScaleRow"
                   relativePoint="BOTTOMLEFT"
                   offsetY="10" />
         </Label>
@@ -256,7 +224,7 @@
                   relativeTo="$(parent)OutlineCombo"
                   relativePoint="BOTTOMLEFT"
                   offsetY="10" />
-          <Dimensions x="340"
+          <Dimensions x="200"
                       y="28" />
         </Button>
         <Control name="$(parent)ResourceGroup"
